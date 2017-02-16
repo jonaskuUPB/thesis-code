@@ -1,0 +1,6 @@
+Build/
+Simulator
+Makefile
+Box2D/
+Simulator.pro.user
+results/*
