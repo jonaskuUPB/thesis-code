@@ -1,0 +1,10 @@
+mutation_rate_float=1
+seed_int=1
+n_steps_per_genome_int=1
+elitism_int=1
+n_generations_int=1
+n_runs_int=1
+n_genomes_int=1
+n_agents_int=2
+ann_type=1
+type_evo_int=1

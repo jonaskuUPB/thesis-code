@@ -12,3 +12,5 @@ Simulator.pro.user
 
 # Ignore results
 results/*
+# but not the default settings
+!results/default_settings
