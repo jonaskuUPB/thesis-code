@@ -1,6 +1,14 @@
+# Ignore Build files
 Build/
 Simulator
 Makefile
+
+# Ignore libraries
 Box2D/
+
+
+# Ignore editor files
 Simulator.pro.user
+
+# Ignore results
 results/*
