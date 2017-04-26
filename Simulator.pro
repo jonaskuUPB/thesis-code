@@ -9,6 +9,7 @@ QMAKE_CXXFLAGS += -fno-strict-aliasing
 INCLUDEPATH += Box2D/
 INCLUDEPATH += simulator/
 LIBS += -lBox2D -lpthread -pthread
+LIBS += -L/usr/local/lib/ -lfann
 
 QT       += core gui
 QT       += opengl
@@ -64,5 +65,8 @@ unix:!macx: LIBS += -L$$PWD/Box2D/Build/Box2D/ -lBox2D
 
 INCLUDEPATH += $$PWD/Box2D/Build/Box2D
 DEPENDPATH += $$PWD/Box2D/Build/Box2D
+
+# INCLUDEPATH += $$PWD/FANN
+# DEPENDPATH += $$PWD/FANN
 
 unix:!macx: PRE_TARGETDEPS += $$PWD/Box2D/Build/Box2D/libBox2D.a
