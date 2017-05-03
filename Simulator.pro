@@ -9,7 +9,7 @@ QMAKE_CXXFLAGS += -fno-strict-aliasing
 INCLUDEPATH += Box2D/
 INCLUDEPATH += simulator/
 LIBS += -lBox2D -lpthread -pthread
-LIBS += -L/usr/local/lib/ -lfann
+# LIBS += -L/usr/local/lib/ -lfann
 
 QT       += core gui
 QT       += opengl

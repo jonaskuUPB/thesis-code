@@ -1,10 +1,10 @@
 ann_type=1
 elitism_int=1
 mutation_rate_float=0.1
-n_agents_int=5
+n_agents_int=50
 n_generations_int=100
-n_genomes_int=10
+n_genomes_int=50
 n_runs_int=1
-n_steps_per_genome_int=1000
+n_steps_per_genome_int=2000
 seed_int=-1490677913
 type_evo_int=1
