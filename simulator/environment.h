@@ -116,6 +116,11 @@ protected:
     int action_layer_start = 0;
 
     std::mt19937 mt;
+
+    void finished_generation();
+    void finished_run();
+    void finished_experiment();
+
 };
 
 #endif

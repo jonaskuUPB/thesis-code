@@ -32,6 +32,9 @@ private slots:
     void on_treeView_doubleClicked(const QModelIndex &index);
     void on_pb_LogData_released();
 
+    void on_replayPushButton_clicked();
+    void toggle_simulation();
+
 private:
     Ui::MainWindow *ui;
     std::map<int, QString> intList;

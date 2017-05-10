@@ -29,9 +29,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_playPushButton_clicked()
-{
-    ui->environmentWidget->evolution = ui->checkBox->isChecked();
+void MainWindow::toggle_simulation() {
     start_pushed = !start_pushed;
     if(start_pushed){
         timer->start();
@@ -41,6 +39,13 @@ void MainWindow::on_playPushButton_clicked()
         timer->stop();
         ui->playPushButton->setText("Play");
     }
+}
+
+void MainWindow::on_playPushButton_clicked()
+{
+    ui->environmentWidget->replay = false;
+    ui->environmentWidget->evolution = ui->checkBox->isChecked();
+    toggle_simulation();
 }
 
 void MainWindow::setEnvironment(Environment* env){
@@ -128,4 +133,10 @@ void MainWindow::readAndSetSettingsfromUi(){
 void MainWindow::on_pb_LogData_released()
 {
     ui->environmentWidget->saveTrace();
+}
+
+void MainWindow::on_replayPushButton_clicked()
+{
+    ui->environmentWidget->replay = true;
+    toggle_simulation();
 }

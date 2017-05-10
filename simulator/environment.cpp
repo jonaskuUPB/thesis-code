@@ -197,6 +197,10 @@ void Environment::printResults(){
     }
 }
 
+//TODO: Idea: Only one method updateEnvironment that checks if it needs to do nothing, update one step, update the next generation or read the next genome
+
+/*
+
 void Environment::updateEnvironment() {
     if(!finished){
         if(run_counter < setting_n_runs){ // runs
@@ -357,6 +361,185 @@ void Environment::updateEnvironment() {
             run_counter = 0;
         }
     }
+}
+*/
+
+void Environment::updateEnvironment() {
+    if(!finished){
+        if(run_counter < setting_n_runs){ // runs
+            if(generation_counter < setting_n_generations){ // generation
+                if(genome_counter < setting_n_genomes){ // genome
+                    if(steps < setting_steps_per_genome){ // steps
+                        _world->Step(1.0f / 60.0f, 32, 16);
+                        steps++;
+                        if(!genome_set){
+                            for(auto const& a : agents){
+                                a->genome = population_genomes[genome_counter];
+                            }
+                            genome_set = true;
+                        }
+                        for(auto const& a : agents){
+                            a->update();
+                            current_fitness += a->getFitness();
+                        }
+                        temp_actions_per_gen.push_back(getAverageAction());
+                        temp_speeds_per_gen.push_back(getAverageSpeed());
+                        temp_rotations_per_gen.push_back(getAverageDeltaAngle());
+                    }else{ // steps/genome finished
+//                        std::cout << "Steps finished" << std::endl;
+                        steps = 0;
+                        genome_set = false;
+
+                        data_action.push_back(temp_actions_per_gen);
+                        data_speed.push_back(temp_speeds_per_gen);
+                        data_rotation.push_back(temp_rotations_per_gen);
+
+                        temp_actions_per_gen.clear();
+                        temp_speeds_per_gen.clear();
+                        temp_rotations_per_gen.clear();
+
+                        float current_avg_fitness = current_fitness / (float)(std::stoi(settings["n_steps_per_genome_int"]) * std::stoi(settings["n_agents_int"]));
+                        current_fitness = 0.0;
+                        genome_fitnesses.push_back(current_avg_fitness);
+                        std::cout << "Exp ID " << exp_id << ": Generation " << generation_counter << "; Genome " << genome_counter << "; Fitness " << current_avg_fitness << std::endl;
+                        genome_counter++;
+                        for(auto const& a : agents){
+                            a->reset_to_initial_position();
+                        }
+                    }
+                }else{ // genomes finished
+                    finished_generation();
+                }
+            }else{ // generations finished
+                finished_run();
+            }
+        }else{ // all runs finished => evaluation
+            finished_experiment();
+        }
+    }
+}
+
+//called after finishing a whole generation in evolution
+void Environment::finished_generation() {
+    genome_counter = 0;
+//                    std::cout << "Genomes finished" << std::endl;
+    std::unique_lock<std::mutex> lock(Environment::cout_mutex);
+
+    std::vector<int> sorted_indices(genome_fitnesses.size());
+    std::size_t n(0);
+    std::generate(std::begin(sorted_indices), std::end(sorted_indices), [&]{return n++;});
+
+    std::sort( std::begin(sorted_indices), std::end(sorted_indices), [&](int i1, int i2){return genome_fitnesses[i1]> genome_fitnesses[i2];});
+
+    std::string fname = "gen_" + std::to_string(generation_counter);
+    std::ofstream file;
+    file.open(genome_folder+fname);
+    for(unsigned int i = 0; i < sorted_indices.size(); i++){
+        file << genome_fitnesses[sorted_indices[i]];
+        for(unsigned int k = 0; k < population_genomes[sorted_indices[i]].size(); k++)
+            file << " " << population_genomes[sorted_indices[i]][k];
+        file << "\n";
+    }
+    file.close();
+
+    std::ofstream file_stream;
+
+    std::string action_fname = actions_folder+"action_gen_"+std::to_string(generation_counter);
+    file_stream.open(action_fname);
+    for(unsigned int i = 0; i < sorted_indices.size(); i++){
+        for(auto v : data_action[sorted_indices[i]])
+            file_stream << v << " ";
+        file_stream << "\n";
+    }
+    file_stream.close();
+    data_action.clear();
+
+    std::string speed_fname = actions_folder+"speed_gen_"+std::to_string(generation_counter);
+    file_stream.open(speed_fname);
+    for(unsigned int i = 0; i < sorted_indices.size(); i++){
+        for(auto v : data_speed[sorted_indices[i]]){
+            // std::cout << v << " ";
+            file_stream << v << " ";
+        }
+        // std::cout << std::endl;
+        file_stream << "\n";
+    }
+    file_stream.close();
+    data_speed.clear();
+
+    std::string rotation_fname = actions_folder+"rotation_gen_"+std::to_string(generation_counter);
+    file_stream.open(rotation_fname);
+    for(unsigned int i = 0; i < sorted_indices.size(); i++){
+        for(auto v : data_rotation[sorted_indices[i]])
+            file_stream << v << " ";
+        file_stream << "\n";
+    }
+    file_stream.close();
+    data_rotation.clear();
+
+
+    std::cout << "Experiment "<< exp_id << ": Finished generation " << generation_counter << std::endl;
+    lock.unlock();
+    generation_counter++;
+
+    generation_fitnesses.push_back(genome_fitnesses);
+    all_genomes.push_back(population_genomes);
+
+    // make offsprings
+    std::vector<std::vector<float>> temp_genomes;
+    for(int elitist = 0; elitist < setting_elitism; elitist++){
+//                                int max_index = 0;
+//                                auto max_f = std::max_element(this_genome_fitness.begin(), this_genome_fitness.end());
+//                                max_index = std::distance(this_genome_fitness.begin(), max_f);
+//                              std::cout << "exp_id: " << exp_id << "\t" << elitist << "\t" << max_index << "\t" << this_genome_fitness.size() << std::endl;
+        temp_genomes.push_back(population_genomes[sorted_indices[elitist]]);
+//                              this_genome_fitness[max_index] = 0.0;
+    }
+    for(int i = 0; i < (std::stoi(settings["n_genomes_int"])-std::stoi(settings["elitism_int"])); i++){
+        temp_genomes.push_back(mutateP(population_genomes[rouletteWheelSelection(genome_fitnesses)],mutation_rate));
+    }
+
+    genome_fitnesses.clear();
+    population_genomes.clear();
+    population_genomes = temp_genomes;
+    temp_genomes.clear();
+    for(auto const& a : agents){
+        a->new_random_position(mt);
+        a->reset_to_initial_position();
+    }
+}
+
+
+//called after finishing all generations of a single run
+void Environment::finished_run() {
+    generation_counter = 0;
+    std::unique_lock<std::mutex> lock(Environment::cout_mutex);
+    std::string fname = "run_" + std::to_string(run_counter);
+    fname.append("_exp-id_" + std::to_string(exp_id));
+    std::ofstream file;
+    file.open(current_folder+fname);
+    int gen = 0;
+    for(auto const& generation : generation_fitnesses){
+        file << ++gen;
+        for(auto const& genome : generation){
+            file << " " << genome;
+        }
+        file << "\n";
+    }
+    file.close();
+
+    std::cout << "Experiment "<< exp_id << ": Finished run " << run_counter++ << std::endl;
+    lock.unlock();
+    population_genomes = population_genomes_backup;
+
+    run_fitnesses.push_back(generation_fitnesses);
+    generation_fitnesses.clear();
+}
+
+//called after finishing all runs of an experiment
+void Environment::finished_experiment(){
+    finished = true;
+    run_counter = 0;
 }
 
 void Environment::updateWithoutEvoProcess(){
