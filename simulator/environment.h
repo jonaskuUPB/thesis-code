@@ -89,6 +89,9 @@ public:
 
     std::map<std::string, std::string> settings;
     int exp_id = 0;
+
+    int mode = 1; //0=play single genome; 1=evolution; 2=replay_experiment
+
 protected:
     b2World* _world;
     QTimer timer;
@@ -117,9 +120,13 @@ protected:
 
     std::mt19937 mt;
 
+private:
+    void finished_genome();
     void finished_generation();
     void finished_run();
     void finished_experiment();
+
+    std::vector<float> next_genome;
 
 };
 

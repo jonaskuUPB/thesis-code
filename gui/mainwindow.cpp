@@ -44,6 +44,7 @@ void MainWindow::toggle_simulation() {
 void MainWindow::on_playPushButton_clicked()
 {
     ui->environmentWidget->replay = false;
+    //ui->environmentWidget->env->mode=1;
     ui->environmentWidget->evolution = ui->checkBox->isChecked();
     toggle_simulation();
 }
