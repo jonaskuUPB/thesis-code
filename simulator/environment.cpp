@@ -237,38 +237,90 @@ void Environment::updateEnvironment() {
     }
 }
 
+void Environment::save_genome_stats(){
+    data_action.push_back(temp_actions_per_gen);
+    data_speed.push_back(temp_speeds_per_gen);
+    data_rotation.push_back(temp_rotations_per_gen);
+
+    temp_actions_per_gen.clear();
+    temp_speeds_per_gen.clear();
+    temp_rotations_per_gen.clear();
+}
+
 void Environment::finished_genome() {
     steps = 0;
 
     if(mode>0){
         genome_set = false;
-
-        data_action.push_back(temp_actions_per_gen);
-        data_speed.push_back(temp_speeds_per_gen);
-        data_rotation.push_back(temp_rotations_per_gen);
-
-        temp_actions_per_gen.clear();
-        temp_speeds_per_gen.clear();
-        temp_rotations_per_gen.clear();
-
+        save_genome_stats();
         float current_avg_fitness = current_fitness / (float)(std::stoi(settings["n_steps_per_genome_int"]) * std::stoi(settings["n_agents_int"]));
         current_fitness = 0.0;
         genome_fitnesses.push_back(current_avg_fitness);
         std::cout << "Exp ID " << exp_id << ": Generation " << generation_counter << "; Genome " << genome_counter << "; Fitness " << current_avg_fitness << std::endl;
         genome_counter++;
         next_genome = population_genomes[genome_counter];
-        for(auto const& a : agents){
-            a->reset_to_initial_position();
-        }
     }
+    for(auto const& a : agents){
+        a->reset_to_initial_position();
+    }
+}
+
+void Environment::save_generation_stats(std::vector<int> sorted_indices) {
+    std::unique_lock<std::mutex> lock(Environment::cout_mutex);
+
+    std::string fname = "gen_" + std::to_string(generation_counter);
+    std::ofstream file;
+    file.open(genome_folder+fname);
+    for(unsigned int i = 0; i < sorted_indices.size(); i++){
+        file << genome_fitnesses[sorted_indices[i]];
+        for(unsigned int k = 0; k < population_genomes[sorted_indices[i]].size(); k++)
+            file << " " << population_genomes[sorted_indices[i]][k];
+        file << "\n";
+    }
+    file.close();
+
+    std::ofstream file_stream;
+
+    std::string action_fname = actions_folder+"action_gen_"+std::to_string(generation_counter);
+    file_stream.open(action_fname);
+    for(unsigned int i = 0; i < sorted_indices.size(); i++){
+        for(auto v : data_action[sorted_indices[i]])
+            file_stream << v << " ";
+        file_stream << "\n";
+    }
+    file_stream.close();
+    data_action.clear();
+
+    std::string speed_fname = actions_folder+"speed_gen_"+std::to_string(generation_counter);
+    file_stream.open(speed_fname);
+    for(unsigned int i = 0; i < sorted_indices.size(); i++){
+        for(auto v : data_speed[sorted_indices[i]]){
+            file_stream << v << " ";
+        }
+        file_stream << "\n";
+    }
+    file_stream.close();
+    data_speed.clear();
+
+    std::string rotation_fname = actions_folder+"rotation_gen_"+std::to_string(generation_counter);
+    file_stream.open(rotation_fname);
+    for(unsigned int i = 0; i < sorted_indices.size(); i++){
+        for(auto v : data_rotation[sorted_indices[i]])
+            file_stream << v << " ";
+        file_stream << "\n";
+    }
+    file_stream.close();
+    data_rotation.clear();
+
+
+    std::cout << "Experiment "<< exp_id << ": Finished generation " << generation_counter << std::endl;
+    lock.unlock();
 }
 
 //called after finishing a whole generation in evolution
 void Environment::finished_generation() {
     if(mode==1){
         genome_counter = 0;
-        //                    std::cout << "Genomes finished" << std::endl;
-        std::unique_lock<std::mutex> lock(Environment::cout_mutex);
 
         std::vector<int> sorted_indices(genome_fitnesses.size());
         std::size_t n(0);
@@ -276,55 +328,8 @@ void Environment::finished_generation() {
 
         std::sort( std::begin(sorted_indices), std::end(sorted_indices), [&](int i1, int i2){return genome_fitnesses[i1]> genome_fitnesses[i2];});
 
-        std::string fname = "gen_" + std::to_string(generation_counter);
-        std::ofstream file;
-        file.open(genome_folder+fname);
-        for(unsigned int i = 0; i < sorted_indices.size(); i++){
-            file << genome_fitnesses[sorted_indices[i]];
-            for(unsigned int k = 0; k < population_genomes[sorted_indices[i]].size(); k++)
-                file << " " << population_genomes[sorted_indices[i]][k];
-            file << "\n";
-        }
-        file.close();
+        save_generation_stats(sorted_indices);
 
-        std::ofstream file_stream;
-
-        std::string action_fname = actions_folder+"action_gen_"+std::to_string(generation_counter);
-        file_stream.open(action_fname);
-        for(unsigned int i = 0; i < sorted_indices.size(); i++){
-            for(auto v : data_action[sorted_indices[i]])
-                file_stream << v << " ";
-            file_stream << "\n";
-        }
-        file_stream.close();
-        data_action.clear();
-
-        std::string speed_fname = actions_folder+"speed_gen_"+std::to_string(generation_counter);
-        file_stream.open(speed_fname);
-        for(unsigned int i = 0; i < sorted_indices.size(); i++){
-            for(auto v : data_speed[sorted_indices[i]]){
-                // std::cout << v << " ";
-                file_stream << v << " ";
-            }
-            // std::cout << std::endl;
-            file_stream << "\n";
-        }
-        file_stream.close();
-        data_speed.clear();
-
-        std::string rotation_fname = actions_folder+"rotation_gen_"+std::to_string(generation_counter);
-        file_stream.open(rotation_fname);
-        for(unsigned int i = 0; i < sorted_indices.size(); i++){
-            for(auto v : data_rotation[sorted_indices[i]])
-                file_stream << v << " ";
-            file_stream << "\n";
-        }
-        file_stream.close();
-        data_rotation.clear();
-
-
-        std::cout << "Experiment "<< exp_id << ": Finished generation " << generation_counter << std::endl;
-        lock.unlock();
         generation_counter++;
 
         generation_fitnesses.push_back(genome_fitnesses);

@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <iostream>
 #include <queue>
-#include "simulator/configuration.h"
 #include "gui/mainwindow.h"
 #include "threadclass.h"
 #include "Utils.h"

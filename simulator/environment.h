@@ -128,6 +128,9 @@ private:
 
     std::vector<float> next_genome;
 
+    void save_genome_stats();
+    void save_generation_stats(std::vector<int> sorted_indices);
+
 };
 
 #endif
