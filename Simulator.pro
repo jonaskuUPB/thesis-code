@@ -28,7 +28,6 @@ SOURCES += main.cpp \
     simulator/agent.cpp \
     simulator/contactlistener.cpp \
     gui/mainwindow.cpp \
-    simulator/configuration.cpp \
     threadclass.cpp \
     gui/environmentwidget.cpp \
     simulator/controllers/c1.cpp \
@@ -46,7 +45,6 @@ HEADERS  += \
     simulator/agent.h \
     simulator/contactlistener.h \
     gui/mainwindow.h \
-    simulator/configuration.h \
     threadclass.h \
     gui/environmentwidget.h \
     simulator/controllers/c1.h \

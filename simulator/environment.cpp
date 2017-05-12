@@ -317,9 +317,13 @@ void Environment::save_generation_stats(std::vector<int> sorted_indices) {
     lock.unlock();
 }
 
+std::vector<std::vector<float>> Environment::load_genomes_from_file() {
+
+}
+
 //called after finishing a whole generation in evolution
 void Environment::finished_generation() {
-    if(mode==1){
+    if(mode>0){
         genome_counter = 0;
 
         std::vector<int> sorted_indices(genome_fitnesses.size());
@@ -334,21 +338,19 @@ void Environment::finished_generation() {
 
         generation_fitnesses.push_back(genome_fitnesses);
         all_genomes.push_back(population_genomes);
-
-        // make offsprings
         std::vector<std::vector<float>> temp_genomes;
-        for(int elitist = 0; elitist < setting_elitism; elitist++){
-            //                                int max_index = 0;
-            //                                auto max_f = std::max_element(this_genome_fitness.begin(), this_genome_fitness.end());
-            //                                max_index = std::distance(this_genome_fitness.begin(), max_f);
-            //                              std::cout << "exp_id: " << exp_id << "\t" << elitist << "\t" << max_index << "\t" << this_genome_fitness.size() << std::endl;
-            temp_genomes.push_back(population_genomes[sorted_indices[elitist]]);
-            //                              this_genome_fitness[max_index] = 0.0;
+        if(mode==1){
+            // make offsprings
+            for(int elitist = 0; elitist < setting_elitism; elitist++){
+                temp_genomes.push_back(population_genomes[sorted_indices[elitist]]);
+            }
+            for(int i = 0; i < (std::stoi(settings["n_genomes_int"])-std::stoi(settings["elitism_int"])); i++){
+                temp_genomes.push_back(mutateP(population_genomes[rouletteWheelSelection(genome_fitnesses)],mutation_rate));
+            }
+        } else {
+            //read next generation from file
+            temp_genomes = load_genomes_from_file();
         }
-        for(int i = 0; i < (std::stoi(settings["n_genomes_int"])-std::stoi(settings["elitism_int"])); i++){
-            temp_genomes.push_back(mutateP(population_genomes[rouletteWheelSelection(genome_fitnesses)],mutation_rate));
-        }
-
         genome_fitnesses.clear();
         population_genomes.clear();
         population_genomes = temp_genomes;
