@@ -130,7 +130,6 @@ private:
 
     void save_genome_stats();
     void save_generation_stats(std::vector<int> sorted_indices);
-    std::vector<std::vector<float>> load_genomes_from_file();
 
 };
 
