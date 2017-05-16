@@ -38,21 +38,23 @@ int main(int argc, char** argv)
     if(randomize){
         std::string exp_folder = Utils::createFolderStructure(0);
         std::string genome_folder = exp_folder + "genomes/";
-        std::string fname = "gen_" + std::to_string(0);
-        std::ofstream file;
-        file.open(genome_folder+fname);
-        std::mt19937 mt;
-        mt.seed(std::stoi("0"));
-        std::uniform_real_distribution<float> uniform_rand_float(-0.5,0.5);
-        for(unsigned int i = 0; i < 40; i++){
-            file << 0;
-            for(unsigned int k = 0; k < 40; k++){
-                float float_value = uniform_rand_float(mt);
-                file << " " << float_value;
+        for(unsigned int gen = 0; gen < std::stoi(default_settings["n_generations_int"]); gen++){
+            std::string fname = "gen_" + std::to_string(gen);
+            std::ofstream file;
+            file.open(genome_folder+fname);
+            std::mt19937 mt;
+            mt.seed(std::stoi("0"));
+            std::uniform_real_distribution<float> uniform_rand_float(-0.5,0.5);
+            for(unsigned int i = 0; i < std::stoi(default_settings["n_genomes_int"]); i++){
+                file << 0; //dummy fitness
+                for(unsigned int k = 0; k < 60; k++){
+                    float float_value = uniform_rand_float(mt);
+                    file << " " << float_value;
+                }
+                file << "\n";
             }
-            file << "\n";
+            file.close();
         }
-        file.close();
     } else
         if(gui){
             guiRun(argc, argv);
