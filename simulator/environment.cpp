@@ -12,6 +12,7 @@
 #include "controllers/c3.h"
 #include "controllers/c4.h"
 #include "controllers/c5.h"
+#include "Utils.h"
 
 std::mutex Environment::cout_mutex;
 int Environment::exp_counter = 0;
@@ -319,7 +320,7 @@ void Environment::save_generation_stats(std::vector<int> sorted_indices) {
 
 //called after finishing a whole generation in evolution
 void Environment::finished_generation() {
-    if(mode==1){
+    if(mode>0){
         genome_counter = 0;
 
         std::vector<int> sorted_indices(genome_fitnesses.size());
@@ -337,16 +338,24 @@ void Environment::finished_generation() {
 
         // make offsprings
         std::vector<std::vector<float>> temp_genomes;
-        for(int elitist = 0; elitist < setting_elitism; elitist++){
-            //                                int max_index = 0;
-            //                                auto max_f = std::max_element(this_genome_fitness.begin(), this_genome_fitness.end());
-            //                                max_index = std::distance(this_genome_fitness.begin(), max_f);
-            //                              std::cout << "exp_id: " << exp_id << "\t" << elitist << "\t" << max_index << "\t" << this_genome_fitness.size() << std::endl;
-            temp_genomes.push_back(population_genomes[sorted_indices[elitist]]);
-            //                              this_genome_fitness[max_index] = 0.0;
-        }
-        for(int i = 0; i < (std::stoi(settings["n_genomes_int"])-std::stoi(settings["elitism_int"])); i++){
-            temp_genomes.push_back(mutateP(population_genomes[rouletteWheelSelection(genome_fitnesses)],mutation_rate));
+        if(mode==1){
+            for(int elitist = 0; elitist < setting_elitism; elitist++){
+                //                                int max_index = 0;
+                //                                auto max_f = std::max_element(this_genome_fitness.begin(), this_genome_fitness.end());
+                //                                max_index = std::distance(this_genome_fitness.begin(), max_f);
+                //                              std::cout << "exp_id: " << exp_id << "\t" << elitist << "\t" << max_index << "\t" << this_genome_fitness.size() << std::endl;
+                temp_genomes.push_back(population_genomes[sorted_indices[elitist]]);
+                //                              this_genome_fitness[max_index] = 0.0;
+            }
+            for(int i = 0; i < (std::stoi(settings["n_genomes_int"])-std::stoi(settings["elitism_int"])); i++){
+                temp_genomes.push_back(mutateP(population_genomes[rouletteWheelSelection(genome_fitnesses)],mutation_rate));
+            }
+        } else {
+            QString path = QString();
+            path.append(QString::fromStdString(genome_folder));
+            path.append(QString::fromStdString("gen_"));
+            path.append(QString::fromStdString(std::to_string(generation_counter+1)));
+            temp_genomes = Utils::readAllGenomesFrom(path);
         }
 
         genome_fitnesses.clear();

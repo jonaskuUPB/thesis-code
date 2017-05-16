@@ -13,7 +13,7 @@
 #include <sys/types.h>
 
 bool gui = true;
-bool randomize = true;
+bool randomize = false;
 std::map<std::string, std::string> default_settings;
 
 int guiRun(int argc, char** argv){
