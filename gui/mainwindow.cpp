@@ -10,11 +10,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     timer = new QTimer(this);
+
+    //set signals for buttons and timeouts
     connect(timer, SIGNAL(timeout()), ui->environmentWidget, SLOT(doStep()));
     connect(ui->pushButton_Reset, SIGNAL(clicked()), this, SLOT(resetEnvironment()));
     connect(ui->pushButton_SetupExperiment, SIGNAL(clicked()), this, SLOT(readAndSetSettingsfromUi()));
     connect(ui->environmentWidget, SIGNAL(initEnvWithSettingsFromUi()), this, SLOT(readAndSetSettingsfromUi()));
     connect(ui->pushButton_NewSeed, SIGNAL(clicked()), this, SLOT(newSeed()));
+
+
     results = new QFileSystemModel();
     results->setRootPath(QDir::currentPath().append("/results"));
     ui->treeView->setModel(results);
@@ -46,6 +50,12 @@ void MainWindow::on_playPushButton_clicked()
     ui->environmentWidget->replay = false;
     //ui->environmentWidget->env->mode=1;
     ui->environmentWidget->evolution = ui->checkBox->isChecked();
+    toggle_simulation();
+}
+
+void MainWindow::on_replayPushButton_clicked()
+{
+    ui->environmentWidget->replay = true;
     toggle_simulation();
 }
 
@@ -136,8 +146,3 @@ void MainWindow::on_pb_LogData_released()
     ui->environmentWidget->saveTrace();
 }
 
-void MainWindow::on_replayPushButton_clicked()
-{
-    ui->environmentWidget->replay = true;
-    toggle_simulation();
-}
