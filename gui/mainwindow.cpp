@@ -186,7 +186,7 @@ void MainWindow::on_ReplayExperimentButton_clicked()
 
 void MainWindow::on_ReplayGenomeButton_clicked()
 {
-    startSimulation(2);
+    startSimulation(0);
 }
 
 void MainWindow::on_pushButtonLoadExperiment_clicked()
@@ -200,4 +200,9 @@ void MainWindow::on_pushButtonLoadExperiment_clicked()
     //update experiment folder
     qDebug() << "New exp folder is " << info.path();
     ui->environmentWidget->setExpFolder(info.path().toStdString());
+}
+
+void MainWindow::on_RunExperimentButton_clicked()
+{
+    startSimulation(2);
 }

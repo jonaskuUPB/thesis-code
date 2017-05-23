@@ -43,11 +43,12 @@ void EnvironmentWidget::mousePressEvent(QMouseEvent *e){
 }
 
 void EnvironmentWidget::doStep(){
-    if(evolution){
+    /*if(evolution){
         env->updateEnvironment();
     }else{
         env->updateWithoutEvoProcess();
-    }
+    }*/
+    env->updateEnvironment();
     update();
 }
 

@@ -199,9 +199,9 @@ void Environment::printResults(){
     }
 }
 
-//TODO: Idea: Only one method updateEnvironment that checks if it needs to do nothing, update one step, update the next generation or read the next genome
+//Idea: Only one method updateEnvironment that checks if it needs to do nothing, update one step, update the next generation or read the next genome
 void Environment::updateEnvironment() {
-    std::cout << finished << " " << run_counter << " " << generation_counter << " " << genome_counter << " " << steps << std::endl;
+    std::cout << mode << " " << finished << " " << run_counter << " " << generation_counter << " " << genome_counter << " " << steps << std::endl;
     if(!finished){
         if(run_counter < setting_n_runs){ // runs
             if(generation_counter < setting_n_generations){ // generation

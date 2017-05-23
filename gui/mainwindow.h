@@ -41,6 +41,8 @@ private slots:
 
     void on_pushButtonLoadExperiment_clicked();
 
+    void on_RunExperimentButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     std::map<int, QString> intList;
