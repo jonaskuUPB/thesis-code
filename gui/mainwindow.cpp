@@ -47,15 +47,7 @@ void MainWindow::toggle_simulation() {
 
 void MainWindow::on_playPushButton_clicked()
 {
-    ui->environmentWidget->replay = false;
-    //ui->environmentWidget->env->mode=1;
     ui->environmentWidget->evolution = ui->checkBox->isChecked();
-    toggle_simulation();
-}
-
-void MainWindow::on_replayPushButton_clicked()
-{
-    ui->environmentWidget->replay = true;
     toggle_simulation();
 }
 
@@ -90,6 +82,7 @@ void MainWindow::on_treeView_doubleClicked(const QModelIndex &index)
     qDebug() << "Clicked on " << info.fileName();
     if(info.isFile() && info.path().endsWith("genomes")){
         qDebug() << "Reading genome "<< ui->sB_GenomeNumber->value() <<" from " <<info.fileName() << ".";
+        //TODO: Load experiment settings from here as well?!
         std::string fitness = ui->environmentWidget->readAndSetGenomeFrom(ui->sB_GenomeNumber->value(), results->filePath(index));
         ui->label_Fitness->setText("Fitness: " + QString::fromStdString(fitness));
     }
@@ -97,6 +90,7 @@ void MainWindow::on_treeView_doubleClicked(const QModelIndex &index)
         qDebug() << "Experiment set up with settings from " <<info.fileName() << ".";
         std::map<std::string, std::string> settings = ui->environmentWidget->readSettingsFrom(results->filePath(index));
         displaySettings(settings);
+        readAndSetSettingsfromUi();
     }
 }
 
@@ -146,3 +140,64 @@ void MainWindow::on_pb_LogData_released()
     ui->environmentWidget->saveTrace();
 }
 
+void MainWindow::on_pushButtonStop_clicked()
+{
+    //stop timer
+    timer->stop();
+    ui->pushButtonPauseResume->setEnabled(false);
+    ui->pushButtonStop->setEnabled(false);
+    ui->pushButtonResetRun->setEnabled(false);
+    //reset experiment
+    resetEnvironment();
+}
+
+void MainWindow::on_pushButtonPauseResume_clicked()
+{
+    if(running) {
+        timer->stop();
+        running = false;
+        ui->pushButtonPauseResume->setText("Resume");
+    } else {
+        timer->start();
+        running = true;
+        ui->pushButtonPauseResume->setText("Pause");
+    }
+}
+
+void MainWindow::on_pushButtonResetRun_clicked()
+{
+    //reset experiment
+    resetEnvironment();
+}
+
+void MainWindow::startSimulation(int mode) {
+    running = true;
+    ui->environmentWidget->setEnvironmentMode(mode);
+    timer->start();
+    ui->pushButtonPauseResume->setEnabled(true);
+    ui->pushButtonStop->setEnabled(true);
+    ui->pushButtonResetRun->setEnabled(true);
+}
+
+void MainWindow::on_ReplayExperimentButton_clicked()
+{
+    startSimulation(1);
+}
+
+void MainWindow::on_ReplayGenomeButton_clicked()
+{
+    startSimulation(2);
+}
+
+void MainWindow::on_pushButtonLoadExperiment_clicked()
+{
+    QModelIndex index = ui->treeView->currentIndex();
+    QFileInfo info(results->filePath(index));
+    qDebug() << "Load experiment " << info.fileName();
+    std::map<std::string, std::string> settings = Utils::readSettingsFrom(info.filePath());
+    displaySettings(settings);
+    readAndSetSettingsfromUi();
+    //update experiment folder
+    qDebug() << "New exp folder is " << info.path();
+    ui->environmentWidget->setExpFolder(info.path().toStdString());
+}

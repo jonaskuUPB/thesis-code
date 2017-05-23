@@ -117,3 +117,15 @@ void EnvironmentWidget::resetEnvironment(){
 void EnvironmentWidget::setLogging(){
     env->logging = true;
 }
+
+void EnvironmentWidget::setEnvironmentMode(int mode){
+    env->mode = mode;
+}
+
+void EnvironmentWidget::setExpFolder(std::string path) {
+    env->exp_folder = path;
+    env->genome_folder = path + "genomes/";
+    env->trajectory_folder = path + "trajectory/";
+    env->actions_folder = path + "actions/";
+    env->settings_folder = path;
+}

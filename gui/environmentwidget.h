@@ -20,7 +20,8 @@ public:
     void setEnvironmentSettings(std::map<std::string, std::string> s);
     void resetEnvironment();
     bool evolution = false;
-    bool replay = false;
+    void setEnvironmentMode(int mode);
+    void setExpFolder(std::string path);
     void setLogging();
     void saveTrace();
 signals:
