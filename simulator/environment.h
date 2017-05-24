@@ -18,7 +18,7 @@
 #define WIDTH   1280
 #define HEIGHT  720
 
-class Environment
+class Environment : QObject
 {
 public:
     explicit Environment();
@@ -91,6 +91,11 @@ public:
     int exp_id = 0;
 
     int mode = 2; //0=play single genome; 1=evolution; 2=replay_experiment
+
+signals:
+    void genomeFinished();
+    void generationFinished();
+    void runFinished();
 
 protected:
     b2World* _world;

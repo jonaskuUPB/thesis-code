@@ -66,29 +66,7 @@
        </item>
        <item>
         <widget class="QWidget" name="widget" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QPushButton" name="RunExperimentButton">
-            <property name="text">
-             <string>Run Experiment</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="ReplayExperimentButton">
-            <property name="text">
-             <string>Replay Experiment</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="ReplayGenomeButton">
-            <property name="text">
-             <string>Replay Genome</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <layout class="QVBoxLayout" name="verticalLayout_2"/>
         </widget>
        </item>
        <item>
@@ -198,6 +176,13 @@
             </property>
             <property name="value">
              <number>0</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2">
+           <widget class="QPushButton" name="ReplayGenomeButton">
+            <property name="text">
+             <string>Replay Genome</string>
             </property>
            </widget>
           </item>
@@ -480,7 +465,29 @@
       <property name="frameShadow">
        <enum>QFrame::Sunken</enum>
       </property>
-      <layout class="QGridLayout" name="gridLayout_2"/>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="2" column="0">
+        <widget class="QPushButton" name="ReplayExperimentButton">
+         <property name="text">
+          <string>Replay Experiment</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QPushButton" name="RunExperimentButton">
+         <property name="text">
+          <string>Run Experiment</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QPushButton" name="pushButtonGenerateRandomANNs">
+         <property name="text">
+          <string>Generate ANNs</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>

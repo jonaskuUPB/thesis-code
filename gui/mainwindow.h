@@ -43,6 +43,8 @@ private slots:
 
     void on_RunExperimentButton_clicked();
 
+    void on_pushButtonGenerateRandomANNs_clicked();
+
 private:
     Ui::MainWindow *ui;
     std::map<int, QString> intList;
