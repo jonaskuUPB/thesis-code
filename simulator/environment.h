@@ -92,6 +92,8 @@ public:
 
     int mode = 2; //0=play single genome; 1=evolution; 2=replay_experiment
 
+    void setPopulation(std::vector<std::vector<float>> genomes);
+
 signals:
     void genomeFinished();
     void generationFinished();
@@ -135,6 +137,8 @@ private:
 
     void save_genome_stats();
     void save_generation_stats(std::vector<int> sorted_indices);
+
+    std::time_t start_gen_time;
 
 };
 

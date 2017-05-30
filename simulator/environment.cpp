@@ -167,6 +167,10 @@ void Environment::setupExperiment(std::map<std::string, std::string> s){
     for(int i = 0; i < 5; i++){
         _world->Step(1.0f / 60.0f, 8, 3);
     }
+
+
+    start_gen_time = std::time(nullptr);
+
     environment_initialized = true;
 }
 
@@ -201,7 +205,7 @@ void Environment::printResults(){
 
 //Idea: Only one method updateEnvironment that checks if it needs to do nothing, update one step, update the next generation or read the next genome
 void Environment::updateEnvironment() {
-    std::cout << mode << " " << finished << " " << run_counter << " " << generation_counter << " " << genome_counter << " " << steps << std::endl;
+    //std::cout << mode << " " << finished << " " << run_counter << " " << generation_counter << " " << genome_counter << " " << steps << std::endl;
     if(!finished){
         if(run_counter < setting_n_runs){ // runs
             if(generation_counter < setting_n_generations){ // generation
@@ -319,6 +323,16 @@ void Environment::save_generation_stats(std::vector<int> sorted_indices) {
     lock.unlock();
 }
 
+void Environment::setPopulation(std::vector<std::vector<float>> genomes){
+    population_genomes.clear();
+    population_genomes = genomes;
+    genome_counter = 0;
+    for(auto const& a : agents){
+        a->genome = population_genomes[genome_counter]; // initial genome from population
+    }
+    next_genome = population_genomes[genome_counter+1];
+}
+
 //called after finishing a whole generation in evolution
 void Environment::finished_generation() {
     if(mode>0){
@@ -360,15 +374,17 @@ void Environment::finished_generation() {
         }
 
         genome_fitnesses.clear();
-        population_genomes.clear();
-        population_genomes = temp_genomes;
-        next_genome= population_genomes[0];
+        setPopulation(temp_genomes);
         temp_genomes.clear();
         for(auto const& a : agents){
             a->new_random_position(mt);
             a->reset_to_initial_position();
         }
     }
+    time_t end_gen_time = std::time(nullptr);
+    double result= difftime(end_gen_time, start_gen_time);
+    std::cout << "Generation took " << result << " seconds\n";
+    start_gen_time = end_gen_time;
 }
 
 

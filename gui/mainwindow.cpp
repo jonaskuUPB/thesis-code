@@ -181,6 +181,12 @@ void MainWindow::startSimulation(int mode) {
 
 void MainWindow::on_ReplayExperimentButton_clicked()
 {
+    //load first generation from file
+    QString path = QString();
+    path.append(QString::fromStdString(ui->environmentWidget->getEnvironment()->genome_folder));
+    path.append(QString::fromStdString("gen_0"));
+    std::vector<std::vector<float>> temp_genomes = Utils::readAllGenomesFrom(path);
+    ui->environmentWidget->getEnvironment()->setPopulation(temp_genomes);
     startSimulation(2);
 }
 
@@ -213,12 +219,12 @@ void MainWindow::on_pushButtonGenerateRandomANNs_clicked()
     std::string exp_folder = ui->environmentWidget->getEnvironment()->exp_folder;
     std::map<std::string, std::string> settings = ui->environmentWidget->getEnvironment()->settings;
     std::string genome_folder = exp_folder + "genomes/";
+    std::mt19937 mt;
+    mt.seed(std::stoi(settings["seed_int"]));
     for(unsigned int gen = 0; gen < std::stoi(settings["n_generations_int"]); gen++){
         std::string fname = "gen_" + std::to_string(gen);
         std::ofstream file;
         file.open(genome_folder+fname);
-        std::mt19937 mt;
-        mt.seed(std::stoi("0"));
         std::uniform_real_distribution<float> uniform_rand_float(-0.5,0.5);
         for(unsigned int i = 0; i < std::stoi(settings["n_genomes_int"]); i++){
             file << 0; //dummy fitness
