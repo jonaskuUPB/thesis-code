@@ -13,6 +13,7 @@ void ThreadClass::SetupEnvironment(std::map<std::string, std::string> s)
 
 void ThreadClass::StartEvoProcess()
 {
+    env->mode = 1;
     t = std::thread(&ThreadClass::ThreadEvoMain,this);
 }
 

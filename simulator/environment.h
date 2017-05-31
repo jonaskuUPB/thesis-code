@@ -90,7 +90,7 @@ public:
     std::map<std::string, std::string> settings;
     int exp_id = 0;
 
-    int mode = 2; //0=play single genome; 1=evolution; 2=replay_experiment
+    int mode = 1; //0=play single genome; 1=evolution; 2=replay_experiment
 
     void setPopulation(std::vector<std::vector<float>> genomes);
 

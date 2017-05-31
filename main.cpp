@@ -12,8 +12,8 @@
 #include <random>
 #include <sys/types.h>
 
-bool gui = true;
-bool randomize = false;
+bool gui = false;
+//bool randomize = false;
 std::map<std::string, std::string> default_settings;
 
 int guiRun(int argc, char** argv){
@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 {
     // read default settings from file
     default_settings = Utils::readSettingsFrom("results/default_settings");
-    if(randomize){
+    /*if(randomize){
         std::string exp_folder = Utils::createFolderStructure(0);
         std::string genome_folder = exp_folder + "genomes/";
         for(unsigned int gen = 0; gen < std::stoi(default_settings["n_generations_int"]); gen++){
@@ -55,12 +55,16 @@ int main(int argc, char** argv)
             }
             file.close();
         }
-    } else
+    } else*/
         if(gui){
             guiRun(argc, argv);
         }else{
-
-            unsigned concurrentThreadsSupported = std::thread::hardware_concurrency();
+            ThreadClass* t = new ThreadClass();
+            t->SetupEnvironment(default_settings);
+            t->StartEvoProcess();
+            t->Join();
+            system("shutdown -P now");
+            /*unsigned concurrentThreadsSupported = std::thread::hardware_concurrency();
             std::cout << "Number of supported threads: " << concurrentThreadsSupported << std::endl;
 
             //int numberOfExperiments = concurrentThreadsSupported * 4;
@@ -99,6 +103,6 @@ int main(int argc, char** argv)
                 for(auto &t : t_list)
                     t->Join();
 
-            }
+            }*/
         }
 }

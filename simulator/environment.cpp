@@ -264,7 +264,9 @@ void Environment::finished_genome() {
         genome_fitnesses.push_back(current_avg_fitness);
         std::cout << "Exp ID " << exp_id << ": Generation " << generation_counter << "; Genome " << genome_counter << "; Fitness " << current_avg_fitness << std::endl;
         genome_counter++;
-        next_genome = population_genomes[genome_counter];
+        if(genome_counter < setting_n_genomes){
+            next_genome = population_genomes[genome_counter];
+        }
     }
     for(auto const& a : agents){
         a->reset_to_initial_position();
