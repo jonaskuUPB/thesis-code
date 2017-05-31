@@ -57,7 +57,7 @@ void MainWindow::setEnvironment(Environment* env){
 }
 
 void MainWindow::newSeed(){
-    int s = rand() % 9000000000 + 1000000000;
+    int s = Utils::newSeed();
     ui->lineEdit_Seed->setText(QString::number(s));
     readAndSetSettingsfromUi();
 }

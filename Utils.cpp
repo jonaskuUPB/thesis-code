@@ -105,4 +105,9 @@ namespace Utils {
         f.close();
         return return_vector;
     }
+
+    int newSeed() {
+        int s = rand() % 9000000000 + 1000000000;
+        return s;
+    }
 }

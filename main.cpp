@@ -12,7 +12,7 @@
 #include <random>
 #include <sys/types.h>
 
-bool gui = false;
+bool gui = true;
 //bool randomize = false;
 std::map<std::string, std::string> default_settings;
 
@@ -35,6 +35,8 @@ int main(int argc, char** argv)
 {
     // read default settings from file
     default_settings = Utils::readSettingsFrom("results/default_settings");
+    srand(time(NULL));
+    default_settings["seed_int"] = std::to_string(Utils::newSeed());
     /*if(randomize){
         std::string exp_folder = Utils::createFolderStructure(0);
         std::string genome_folder = exp_folder + "genomes/";
@@ -74,7 +76,6 @@ int main(int argc, char** argv)
 
             std::string controller[] = {"1","2","3","4","5"};
             std::string n_agents[] = {"25","50","75","100"};
-            srand(time(NULL));
 
             for(int i = 0; i < numberOfExperiments; i++){
                 int s = rand() % 9000000000 + 1000000000;

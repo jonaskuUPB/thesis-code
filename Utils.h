@@ -8,6 +8,7 @@ namespace Utils {
     std::map<std::string, std::string> readSettingsFrom(QString path);
     std::vector<float> readBestGenomeFrom(QString path);
     std::vector<std::vector<float>> readAllGenomesFrom(QString path);
+    int newSeed();
 }
 
 #endif // UTILS_H
