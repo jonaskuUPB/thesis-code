@@ -10,6 +10,7 @@ public:
     ThreadClass();
     void SetupEnvironment(std::map<std::string, std::string> s);
     void StartEvoProcess();
+    void StartReplayProcess();
     void Join();
     bool IsJoinable();
     void ThreadEvoMain();

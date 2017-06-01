@@ -17,6 +17,17 @@ void ThreadClass::StartEvoProcess()
     t = std::thread(&ThreadClass::ThreadEvoMain,this);
 }
 
+void ThreadClass::StartReplayProcess(){
+    env->mode = 2;
+    env->generateRandomANNs();
+    QString path = QString();
+    path.append(QString::fromStdString(env->genome_folder));
+    path.append(QString::fromStdString("gen_0"));
+    std::vector<std::vector<float>> temp_genomes = Utils::readAllGenomesFrom(path);
+    env->setPopulation(temp_genomes);
+    t = std::thread(&ThreadClass::ThreadEvoMain,this);
+}
+
 void ThreadClass::Join()
 {
     t.join();

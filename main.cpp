@@ -12,7 +12,7 @@
 #include <random>
 #include <sys/types.h>
 
-bool gui = true;
+bool gui = false;
 //bool randomize = false;
 std::map<std::string, std::string> default_settings;
 
@@ -37,73 +37,20 @@ int main(int argc, char** argv)
     default_settings = Utils::readSettingsFrom("results/default_settings");
     srand(time(NULL));
     default_settings["seed_int"] = std::to_string(Utils::newSeed());
-    /*if(randomize){
-        std::string exp_folder = Utils::createFolderStructure(0);
-        std::string genome_folder = exp_folder + "genomes/";
-        for(unsigned int gen = 0; gen < std::stoi(default_settings["n_generations_int"]); gen++){
-            std::string fname = "gen_" + std::to_string(gen);
-            std::ofstream file;
-            file.open(genome_folder+fname);
-            std::mt19937 mt;
-            mt.seed(std::stoi("0"));
-            std::uniform_real_distribution<float> uniform_rand_float(-0.5,0.5);
-            for(unsigned int i = 0; i < std::stoi(default_settings["n_genomes_int"]); i++){
-                file << 0; //dummy fitness
-                for(unsigned int k = 0; k < 60; k++){
-                    float float_value = uniform_rand_float(mt);
-                    file << " " << float_value;
-                }
-                file << "\n";
-            }
-            file.close();
-        }
-    } else*/
         if(gui){
             guiRun(argc, argv);
         }else{
+            //Run an evolution
             ThreadClass* t = new ThreadClass();
             t->SetupEnvironment(default_settings);
             t->StartEvoProcess();
             t->Join();
+            //Run a replay
+            ThreadClass* t2 = new ThreadClass();
+            t2->SetupEnvironment(default_settings);
+            t2->StartReplayProcess();
+            t2->Join();
+            //finally turn of the computer
             system("shutdown -P now");
-            /*unsigned concurrentThreadsSupported = std::thread::hardware_concurrency();
-            std::cout << "Number of supported threads: " << concurrentThreadsSupported << std::endl;
-
-            //int numberOfExperiments = concurrentThreadsSupported * 4;
-            int numberOfExperiments =  4;
-
-            std::queue<ThreadClass*> q;
-
-            std::string controller[] = {"1","2","3","4","5"};
-            std::string n_agents[] = {"25","50","75","100"};
-
-            for(int i = 0; i < numberOfExperiments; i++){
-                int s = rand() % 9000000000 + 1000000000;
-                default_settings["seed_int"] = std::to_string(s);
-                default_settings["ann_type"] = controller[3];
-                default_settings["n_agents_int"] = n_agents[i];
-                ThreadClass* t = new ThreadClass();
-                t->SetupEnvironment(default_settings);
-                q.push(t);
-            }
-
-            while(!q.empty()){
-                std::vector<ThreadClass*> t_list;
-
-                for(unsigned int i = 0; i < concurrentThreadsSupported; i++){
-                    if(!q.empty()){
-                        t_list.push_back(q.front());
-                        q.pop();
-                    }
-                }
-
-                for(auto &t : t_list){
-                    t->StartEvoProcess();
-                }
-
-                for(auto &t : t_list)
-                    t->Join();
-
-            }*/
         }
 }

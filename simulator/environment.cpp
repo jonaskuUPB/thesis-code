@@ -174,6 +174,26 @@ void Environment::setupExperiment(std::map<std::string, std::string> s){
     environment_initialized = true;
 }
 
+void Environment::generateRandomANNs(){
+    for(unsigned int gen = 0; gen < std::stoi(settings["n_generations_int"]); gen++){
+        std::string fname = "gen_" + std::to_string(gen);
+        std::ofstream file;
+        file.open(genome_folder+fname);
+        std::mt19937 mt;
+        mt.seed(std::stoi("0"));
+        std::uniform_real_distribution<float> uniform_rand_float(-0.5,0.5);
+        for(unsigned int i = 0; i < std::stoi(settings["n_genomes_int"]); i++){
+            file << 0; //dummy fitness
+            for(unsigned int k = 0; k < 60; k++){
+                float float_value = uniform_rand_float(mt);
+                file << " " << float_value;
+            }
+            file << "\n";
+        }
+        file.close();
+    }
+}
+
 void Environment::setSettings(std::map<std::string, std::string> settings){
     this->settings = settings;
     reset();
@@ -371,7 +391,7 @@ void Environment::finished_generation() {
             QString path = QString();
             path.append(QString::fromStdString(genome_folder));
             path.append(QString::fromStdString("gen_"));
-            path.append(QString::fromStdString(std::to_string(generation_counter+1)));
+            path.append(QString::fromStdString(std::to_string(generation_counter)));
             temp_genomes = Utils::readAllGenomesFrom(path);
         }
 

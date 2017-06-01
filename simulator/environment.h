@@ -92,6 +92,7 @@ public:
 
     int mode = 1; //0=play single genome; 1=evolution; 2=replay_experiment
 
+    void generateRandomANNs();
     void setPopulation(std::vector<std::vector<float>> genomes);
 
 signals:
