@@ -42,15 +42,15 @@ int main(int argc, char** argv)
         }else{
             //Run an evolution
             ThreadClass* t = new ThreadClass();
-            t->SetupEnvironment(default_settings);
+            t->SetupEnvironment("evolution", default_settings);
             t->StartEvoProcess();
             t->Join();
             //Run a replay
             ThreadClass* t2 = new ThreadClass();
-            t2->SetupEnvironment(default_settings);
+            t2->SetupEnvironment("control", default_settings);
             t2->StartReplayProcess();
             t2->Join();
             //finally turn of the computer
-            system("shutdown -P now");
+            //system("shutdown -P now");
         }
 }

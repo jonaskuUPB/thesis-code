@@ -8,7 +8,7 @@ class ThreadClass
 {
 public:
     ThreadClass();
-    void SetupEnvironment(std::map<std::string, std::string> s);
+    void SetupEnvironment(std::string expName, std::map<std::string, std::string> s);
     void StartEvoProcess();
     void StartReplayProcess();
     void Join();

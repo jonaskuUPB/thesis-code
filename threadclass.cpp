@@ -5,9 +5,9 @@
 
 ThreadClass::ThreadClass():t() {}
 
-void ThreadClass::SetupEnvironment(std::map<std::string, std::string> s)
+void ThreadClass::SetupEnvironment(std::string expName, std::map<std::string, std::string> s)
 {
-    env = new Environment();
+    env = new Environment(expName);
     env->setupExperiment(s);
 }
 
@@ -45,7 +45,7 @@ void ThreadClass::ThreadEvoMain()
     }
 
     if(post_evaluation){
-        std::cout << "Starting simulation of experiment " << env->exp_id << std::endl;
+        std::cout << "Starting simulation of experiment " << env->run_id << std::endl;
         std::vector<std::vector<float>> data_action;
         std::vector<std::vector<float>> data_speed;
         std::vector<std::vector<float>> data_rotation;
@@ -75,7 +75,7 @@ void ThreadClass::ThreadEvoMain()
 
         std::ofstream file_stream;
 
-        std::string action_fname = env->actions_folder+"ActionsPerBestGenomePerGeneration";
+        std::string action_fname = env->stats_folder+"ActionsPerBestGenomePerGeneration";
         file_stream.open(action_fname);
         for(auto line : data_action){
             for(auto v : line)
@@ -85,7 +85,7 @@ void ThreadClass::ThreadEvoMain()
         file_stream.close();
         data_action.clear();
 
-        std::string speed_fname = env->actions_folder+"SpeedPerBestGenomePerGeneration";
+        std::string speed_fname = env->stats_folder+"SpeedPerBestGenomePerGeneration";
         file_stream.open(speed_fname);
         for(auto line : data_speed){
             for(auto v : line)
@@ -95,7 +95,7 @@ void ThreadClass::ThreadEvoMain()
         file_stream.close();
         data_speed.clear();
 
-        std::string rotation_fname = env->actions_folder+"RotationPerBestGenomePerGeneration";
+        std::string rotation_fname = env->stats_folder+"RotationPerBestGenomePerGeneration";
         file_stream.open(rotation_fname);
         for(auto line : data_rotation){
             for(auto v : line)
@@ -126,7 +126,7 @@ void ThreadClass::ThreadEvoMain()
             data_rotation.push_back(temp_rotations_per_gen);
         }
 
-        action_fname = env->actions_folder+"ActionsPerGenomePerLastGeneration";
+        action_fname = env->stats_folder+"ActionsPerGenomePerLastGeneration";
         file_stream.open(action_fname);
         for(auto line : data_action){
             for(auto v : line)
@@ -136,7 +136,7 @@ void ThreadClass::ThreadEvoMain()
         file_stream.close();
         data_action.clear();
 
-        speed_fname = env->actions_folder+"SpeedPerGenomePerLastGeneration";
+        speed_fname = env->stats_folder+"SpeedPerGenomePerLastGeneration";
         file_stream.open(speed_fname);
         for(auto line : data_speed){
             for(auto v : line)
@@ -146,7 +146,7 @@ void ThreadClass::ThreadEvoMain()
         file_stream.close();
         data_speed.clear();
 
-        rotation_fname = env->actions_folder+"RotationPerGenomePerLastGeneration";
+        rotation_fname = env->stats_folder+"RotationPerGenomePerLastGeneration";
         file_stream.open(rotation_fname);
         for(auto line : data_rotation){
             for(auto v : line)

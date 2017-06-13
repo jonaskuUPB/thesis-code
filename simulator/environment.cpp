@@ -15,21 +15,22 @@
 #include "Utils.h"
 
 std::mutex Environment::cout_mutex;
-int Environment::exp_counter = 0;
+int Environment::run_counter = 0;
 std::string Environment::current_folder = "";
 
 //Environment::Environment(QWidget *parent): QWidget(parent)
-Environment::Environment()
+Environment::Environment(std::string expName /*= ""*/)
 {
     // static class id
-    exp_id = exp_counter++;
+    run_id = run_counter++;
     // first experiment creates parent folder
-    if(exp_id == 0){
+    if(run_id == 0){
         // current folder name (one per start of simulator)
         std::time_t t = std::time(NULL);
         char mbstr[100];
         std::strftime(mbstr, sizeof(mbstr), "%Y_%m_%d-%H_%M_%S/", std::localtime(&t));
         std::string s(mbstr);
+        s = expName + "-" + s;
         current_folder = base_path.append(s);
         int dir_error = mkdir(current_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         if (-1 == dir_error){
@@ -38,10 +39,10 @@ Environment::Environment()
     }
 
     // experiment folder based on experiment id
-    exp_folder = current_folder + std::to_string(exp_id) + "/";
+    exp_folder = current_folder + std::to_string(run_id) + "/";
     genome_folder = exp_folder + "genomes/";
     trajectory_folder = exp_folder + "trajectory/";
-    actions_folder = exp_folder + "actions/";
+    stats_folder = exp_folder + "stats/";
     settings_folder = exp_folder;
 
     int dir_error = mkdir(exp_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
@@ -56,9 +57,9 @@ Environment::Environment()
     if (-1 == dir_error){
         std::cout << "Error creating directory:" << trajectory_folder << std::endl;
     }
-    dir_error = mkdir(actions_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    dir_error = mkdir(stats_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     if (-1 == dir_error){
-        std::cout << "Error creating directory:" << actions_folder << std::endl;
+        std::cout << "Error creating directory:" << stats_folder << std::endl;
     }
     //    dir_error = mkdir(settings_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     //    if (-1 == dir_error){
@@ -73,7 +74,7 @@ Environment::~Environment() {
 }
 
 void Environment::setupExperiment(std::map<std::string, std::string> s){
-    std::cout << "Setting up experiment " << exp_id << "."  << std::endl;
+    std::cout << "Setting up experiment " << run_id << "."  << std::endl;
     settings = s;
     std::string m_rate = settings["mutation_rate_float"];
     std::replace(m_rate.begin(),m_rate.end(),',','.');
@@ -91,7 +92,7 @@ void Environment::setupExperiment(std::map<std::string, std::string> s){
 
     // write settings to file
     std::string fname = "expId_";
-    fname.append(std::to_string(exp_id)).append("_").append(settings["seed_int"]);
+    fname.append(std::to_string(run_id)).append("_").append(settings["seed_int"]);
     std::ofstream file;
     file.open(settings_folder+fname);
     for(auto const& s : settings){
@@ -101,7 +102,7 @@ void Environment::setupExperiment(std::map<std::string, std::string> s){
 
 
     std::uniform_int_distribution<int> uniform_rand(0,RAND_MAX);
-    std::cout << "Exp_id " <<exp_id << "\t Seed:" << settings["seed_int"] << std::endl;
+    std::cout << "Exp_id " <<run_id << "\t Seed:" << settings["seed_int"] << std::endl;
 
     Agent::counter = 0;
     int number_of_genes = 0;
@@ -282,7 +283,7 @@ void Environment::finished_genome() {
         float current_avg_fitness = current_fitness / (float)(std::stoi(settings["n_steps_per_genome_int"]) * std::stoi(settings["n_agents_int"]));
         current_fitness = 0.0;
         genome_fitnesses.push_back(current_avg_fitness);
-        std::cout << "Exp ID " << exp_id << ": Generation " << generation_counter << "; Genome " << genome_counter << "; Fitness " << current_avg_fitness << std::endl;
+        std::cout << "Exp ID " << run_id << ": Generation " << generation_counter << "; Genome " << genome_counter << "; Fitness " << current_avg_fitness << std::endl;
         genome_counter++;
         if(genome_counter < setting_n_genomes){
             next_genome = population_genomes[genome_counter];
@@ -309,7 +310,7 @@ void Environment::save_generation_stats(std::vector<int> sorted_indices) {
 
     std::ofstream file_stream;
 
-    std::string action_fname = actions_folder+"action_gen_"+std::to_string(generation_counter);
+    std::string action_fname = stats_folder+"action_gen_"+std::to_string(generation_counter);
     file_stream.open(action_fname);
     for(unsigned int i = 0; i < sorted_indices.size(); i++){
         for(auto v : data_action[sorted_indices[i]])
@@ -319,7 +320,7 @@ void Environment::save_generation_stats(std::vector<int> sorted_indices) {
     file_stream.close();
     data_action.clear();
 
-    std::string speed_fname = actions_folder+"speed_gen_"+std::to_string(generation_counter);
+    std::string speed_fname = stats_folder+"speed_gen_"+std::to_string(generation_counter);
     file_stream.open(speed_fname);
     for(unsigned int i = 0; i < sorted_indices.size(); i++){
         for(auto v : data_speed[sorted_indices[i]]){
@@ -330,7 +331,7 @@ void Environment::save_generation_stats(std::vector<int> sorted_indices) {
     file_stream.close();
     data_speed.clear();
 
-    std::string rotation_fname = actions_folder+"rotation_gen_"+std::to_string(generation_counter);
+    std::string rotation_fname = stats_folder+"rotation_gen_"+std::to_string(generation_counter);
     file_stream.open(rotation_fname);
     for(unsigned int i = 0; i < sorted_indices.size(); i++){
         for(auto v : data_rotation[sorted_indices[i]])
@@ -341,7 +342,7 @@ void Environment::save_generation_stats(std::vector<int> sorted_indices) {
     data_rotation.clear();
 
 
-    std::cout << "Experiment "<< exp_id << ": Finished generation " << generation_counter << std::endl;
+    std::cout << "Experiment "<< run_id << ": Finished generation " << generation_counter << std::endl;
     lock.unlock();
 }
 
@@ -415,7 +416,7 @@ void Environment::finished_run() {
     generation_counter = 0;
     std::unique_lock<std::mutex> lock(Environment::cout_mutex);
     std::string fname = "run_" + std::to_string(run_counter);
-    fname.append("_exp-id_" + std::to_string(exp_id));
+    fname.append("_exp-id_" + std::to_string(run_id));
     std::ofstream file;
     file.open(current_folder+fname);
     int gen = 0;
@@ -428,7 +429,7 @@ void Environment::finished_run() {
     }
     file.close();
 
-    std::cout << "Experiment "<< exp_id << ": Finished run " << run_counter++ << std::endl;
+    std::cout << "Experiment "<< run_id << ": Finished run " << run_counter++ << std::endl;
     lock.unlock();
     population_genomes = population_genomes_backup;
 
@@ -534,7 +535,7 @@ void Environment::savePoseAndSpeed(){
 
 void Environment::saveCoveredDistance(){
 
-    std::string fname = "distance_" + std::to_string(exp_id);
+    std::string fname = "distance_" + std::to_string(run_id);
     std::ofstream file;
     file.open(trajectory_folder+fname);
     for(auto &a : agents){
@@ -637,7 +638,7 @@ std::vector<Agent *> &Environment::getAgents(){
 }
 
 void Environment::reset(){
-    std::cout << "Resetting experiment " << exp_id << "." << std::endl;
+    std::cout << "Resetting experiment " << run_id << "." << std::endl;
     for (auto const& a : agents){
         delete a;
     }

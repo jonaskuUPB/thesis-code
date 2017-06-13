@@ -21,7 +21,7 @@
 class Environment : QObject
 {
 public:
-    explicit Environment();
+    explicit Environment(std::string expName = "");
     virtual ~Environment();
     void setupExperiment(std::map<std::string, std::string> s);
     void reset();
@@ -85,10 +85,10 @@ public:
     std::string trajectory_folder;
     std::string settings_folder;
     std::string exp_folder;
-    std::string actions_folder;
+    std::string stats_folder;
 
     std::map<std::string, std::string> settings;
-    int exp_id = 0;
+    int run_id = 0;
 
     int mode = 1; //0=play single genome; 1=evolution; 2=replay_experiment
 
@@ -122,7 +122,7 @@ protected:
     int setting_type_evo = 0;
     int seed = 0;
     static std::mutex cout_mutex;
-    static int exp_counter;
+    static int run_counter;
     float mutation_rate = 0.1;
     int action_layer_start = 0;
 

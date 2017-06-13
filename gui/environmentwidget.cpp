@@ -127,6 +127,6 @@ void EnvironmentWidget::setExpFolder(std::string path) {
     env->exp_folder = path;
     env->genome_folder = path + "genomes/";
     env->trajectory_folder = path + "trajectory/";
-    env->actions_folder = path + "actions/";
+    env->stats_folder = path + "stats/";
     env->settings_folder = path;
 }
