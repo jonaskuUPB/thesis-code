@@ -15,20 +15,15 @@
 #include "Utils.h"
 
 std::mutex Environment::cout_mutex;
-//int Environment::run_counter = 0;
-//std::string Environment::exp_folder = "";
 
-//Environment::Environment(QWidget *parent): QWidget(parent)
 /*
  * Createa an environment for a single experiment. An experiment consists of one or more runs that are executed with the same settings.
  */
 Environment::Environment(std::string expName /*= ""*/)
 {
     run_counter =0;
-    // static class id
-    run_id = run_counter++;
     // first experiment creates parent folder
-    if(run_id == 0){
+    if(run_counter == 0){
         // current folder name (one per start of simulator)
         std::time_t t = std::time(NULL);
         char mbstr[100];
@@ -53,7 +48,7 @@ Environment::~Environment() {
 
 void Environment::setup_run_folder() {
     // experiment folder based on experiment id
-    run_folder = exp_folder + "run_" + std::to_string(run_id) + "/";
+    run_folder = exp_folder + "run_" + std::to_string(run_counter) + "/";
     genome_folder = run_folder + "genomes/";
     trajectory_folder = run_folder + "trajectory/";
     stats_folder = run_folder + "stats/";
@@ -99,8 +94,8 @@ void Environment::setupExperiment(std::map<std::string, std::string> s){
     _world->SetContactListener(cl);
 
     // write settings to file
-    std::string fname = "expId_";
-    fname.append(std::to_string(run_id)).append("_").append(settings["seed_int"]);
+    std::string fname = "settings_run_";
+    fname.append(std::to_string(run_counter)).append("_").append(settings["seed_int"]);
     std::ofstream file;
     file.open(settings_folder+fname);
     for(auto const& s : settings){
@@ -110,7 +105,7 @@ void Environment::setupExperiment(std::map<std::string, std::string> s){
 
 
     std::uniform_int_distribution<int> uniform_rand(0,RAND_MAX);
-    std::cout << "Exp_id " <<run_id << "\t Seed:" << settings["seed_int"] << std::endl;
+    std::cout << "Exp_id " << run_counter << "\t Seed:" << settings["seed_int"] << std::endl;
 
     Agent::counter = 0;
     int number_of_genes = 0;
@@ -291,7 +286,7 @@ void Environment::finished_genome() {
         float current_avg_fitness = current_fitness / (float)(std::stoi(settings["n_steps_per_genome_int"]) * std::stoi(settings["n_agents_int"]));
         current_fitness = 0.0;
         genome_fitnesses.push_back(current_avg_fitness);
-        std::cout << "Exp ID " << run_id << ": Generation " << generation_counter << "; Genome " << genome_counter << "; Fitness " << current_avg_fitness << std::endl;
+        std::cout << "Exp ID " << run_counter << ": Generation " << generation_counter << "; Genome " << genome_counter << "; Fitness " << current_avg_fitness << std::endl;
         genome_counter++;
         if(genome_counter < setting_n_genomes){
             next_genome = population_genomes[genome_counter];
@@ -350,7 +345,7 @@ void Environment::save_generation_stats(std::vector<int> sorted_indices) {
     data_rotation.clear();
 
 
-    std::cout << "Experiment "<< run_id << ": Finished generation " << generation_counter << std::endl;
+    std::cout << "Experiment "<< run_counter << ": Finished generation " << generation_counter << std::endl;
     lock.unlock();
 }
 
@@ -423,7 +418,7 @@ void Environment::finished_run() {
     generation_counter = 0;
     std::unique_lock<std::mutex> lock(Environment::cout_mutex);
     std::string fname = "run_" + std::to_string(run_counter);
-    fname.append("_exp-id_" + std::to_string(run_id));
+    fname.append("_exp-id_" + std::to_string(run_counter));
     std::ofstream file;
     file.open(exp_folder+fname);
     int gen = 0;
@@ -436,15 +431,15 @@ void Environment::finished_run() {
     }
     file.close();
 
-    std::cout << "Experiment "<< run_id << ": Finished run " << run_counter++ << std::endl;
+    std::cout << "Experiment "<< run_counter << ": Finished run " << run_counter << std::endl;
     lock.unlock();
     population_genomes = population_genomes_backup;
 
     run_fitnesses.push_back(generation_fitnesses);
     generation_fitnesses.clear();
 
-    //setup the new folder for the second run
-    run_id++;
+    //setup the new folder for the next run
+    run_counter++;
     setup_run_folder();
 }
 
@@ -546,7 +541,7 @@ void Environment::savePoseAndSpeed(){
 
 void Environment::saveCoveredDistance(){
 
-    std::string fname = "distance_" + std::to_string(run_id);
+    std::string fname = "distance_" + std::to_string(run_counter);
     std::ofstream file;
     file.open(trajectory_folder+fname);
     for(auto &a : agents){
@@ -649,7 +644,7 @@ std::vector<Agent *> &Environment::getAgents(){
 }
 
 void Environment::reset(){
-    std::cout << "Resetting experiment " << run_id << "." << std::endl;
+    std::cout << "Resetting experiment " << run_counter << "." << std::endl;
     for (auto const& a : agents){
         delete a;
     }

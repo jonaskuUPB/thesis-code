@@ -21,53 +21,40 @@
 class Environment : QObject
 {
 public:
+    //constructor and destructor
     explicit Environment(std::string expName = "");
     virtual ~Environment();
+
+    //called when settings change
     void setupExperiment(std::map<std::string, std::string> s);
+
+    //alternative calls for settings
     void reset();
-    void makeSteps(int i);
     void setSettings(std::map<std::string, std::string> settings);
     std::map<std::string, std::string> getSettings();
-    void mousePressEvent(QMouseEvent *e);
-    std::vector<Agent*> &getAgents();
-    b2World* getWorld();
-    bool isRunning();
+    std::map<std::string, std::string> settings;
+
+    //methods and attributes maintaining the population
     std::vector<float>mutate(std::vector<float> genome, float f);
     std::vector<float>mutateP(std::vector<float> genome, float f);
     int rouletteWheelSelection(std::vector<float> fitnesses);
+    void generateRandomANNs();
+    void setPopulation(std::vector<std::vector<float>> genomes);
     std::vector<std::vector<float>> population_genomes;
     std::vector<std::vector<float>> population_genomes_backup;
-
     std::vector<std::vector<std::vector<float>>> all_genomes;
+
+    //attributes for the fitness
     std::vector<std::vector<std::vector<float>>> run_fitnesses;
     std::vector<std::vector<float>> generation_fitnesses;
     std::vector<float> genome_fitnesses;
+    float current_fitness = 0.0;
+
+    //methods to calculate stats
     void calculateClusters();
     void savePoseAndSpeed();
     void saveActions();
     void saveCoveredDistance();
-    float current_fitness = 0.0;
-    int genome_counter = 0;
-    void clickedAgent();
-    void stepsMade(unsigned long int s);
-    void avgFitness(float f);
-    void toggle_simulation_step();
-    void updateEnvironment();
-    void updateWithoutEvoProcess();
-    void doWorldStep();
-    float getAverageSpeed();
-    float getAverageDeltaAngle();
-    float getAverageAction();
-    void setGenomeForAllAgents(std::vector<float> genome);
-    void setTimeStepScale(int s);
-    void set_evolution_type(bool t);
-    void printResults();
-    bool finished = false;
-    bool environment_initialized = false;
-    bool logging = false;
-    int logging_steps = 3000;
-    std::vector<std::vector<float>> log_actions;
-
     std::vector<std::vector<float>> data_action;
     std::vector<std::vector<float>> data_speed;
     std::vector<std::vector<float>> data_rotation;
@@ -75,10 +62,13 @@ public:
     std::vector<float> temp_speeds_per_gen;
     std::vector<float> temp_rotations_per_gen;
 
-    Wall *wall;
-    std::set<std::set<int>> cluster;
-    std::map<int, float> distance;
+    //logging
+    bool logging = false;
+    int logging_steps = 3000;
+    std::vector<std::vector<float>> log_actions;
 
+    //methods and attributes taking care of the folder structure
+    void setup_run_folder();
     std::string base_path = "results/";
     std::string exp_folder;
     std::string genome_folder;
@@ -87,15 +77,33 @@ public:
     std::string run_folder;
     std::string stats_folder;
 
-    std::map<std::string, std::string> settings;
-    int run_id = 0;
-
     int mode = 1; //0=play single genome; 1=evolution; 2=replay_experiment
 
-    void generateRandomANNs();
-    void setPopulation(std::vector<std::vector<float>> genomes);
+    //interaction
+    void mousePressEvent(QMouseEvent *e);
+    void clickedAgent();
 
-    void setup_run_folder();
+    //updateMethods: TODO delete unecessary ones
+    void updateEnvironment();
+    void updateWithoutEvoProcess();
+    void doWorldStep();
+
+
+    //MISC:
+    std::vector<Agent*> &getAgents();
+    b2World* getWorld();
+    bool isRunning();
+    Wall *wall;
+    std::set<std::set<int>> cluster;
+    std::map<int, float> distance;
+    int genome_counter = 0;
+    float getAverageSpeed();
+    float getAverageDeltaAngle();
+    float getAverageAction();
+    void setGenomeForAllAgents(std::vector<float> genome);
+    void printResults();
+    bool finished = false;
+    bool environment_initialized = false;
 
 signals:
     void genomeFinished();
@@ -103,6 +111,9 @@ signals:
     void runFinished();
 
 protected:
+    //int run_id = 0;
+
+
     b2World* _world;
     QTimer timer;
     int steps_to_make = 0;
@@ -116,6 +127,8 @@ protected:
     int run_counter = 0;
     int generation_counter = 0;
     int step_counter = 0;
+
+    //setting variables
     int setting_steps_per_genome = 0;
     int setting_elitism = 0;
     int setting_n_generations = 0;
@@ -123,8 +136,8 @@ protected:
     int setting_n_runs = 0;
     int setting_type_evo = 0;
     int seed = 0;
+
     static std::mutex cout_mutex;
-    //static int run_counter;
     float mutation_rate = 0.1;
     int action_layer_start = 0;
 
