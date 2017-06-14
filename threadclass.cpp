@@ -45,7 +45,7 @@ void ThreadClass::ThreadEvoMain()
     }
 
     if(post_evaluation){
-        //std::cout << "Starting simulation of experiment " << env->run_id << std::endl;
+        //std::cout << "Starting simulation of experiment " << env->expId << std::endl;
         std::vector<std::vector<float>> data_action;
         std::vector<std::vector<float>> data_speed;
         std::vector<std::vector<float>> data_rotation;

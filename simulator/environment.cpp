@@ -27,10 +27,10 @@ Environment::Environment(std::string expName /*= ""*/)
         // current folder name (one per start of simulator)
         std::time_t t = std::time(NULL);
         char mbstr[100];
-        std::strftime(mbstr, sizeof(mbstr), "%Y_%m_%d-%H_%M_%S/", std::localtime(&t));
+        std::strftime(mbstr, sizeof(mbstr), "%Y_%m_%d-%H_%M_%S", std::localtime(&t));
         std::string s(mbstr);
-        s = expName + "-" + s;
-        exp_folder = base_path.append(s);
+        expId = expName + "-" + s;
+        exp_folder = base_path.append(expId+ "/");
         int dir_error = mkdir(exp_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         if (-1 == dir_error){
             std::cout << "Error creating directory:" << exp_folder << std::endl;
@@ -105,7 +105,7 @@ void Environment::setupExperiment(std::map<std::string, std::string> s){
 
 
     std::uniform_int_distribution<int> uniform_rand(0,RAND_MAX);
-    std::cout << "Exp_id " << run_counter << "\t Seed:" << settings["seed_int"] << std::endl;
+    std::cout << "Exp_id " << expId << "\t Seed:" << settings["seed_int"] << std::endl;
 
     Agent::counter = 0;
     int number_of_genes = 0;
@@ -229,7 +229,6 @@ void Environment::printResults(){
 
 //Idea: Only one method updateEnvironment that checks if it needs to do nothing, update one step, update the next generation or read the next genome
 void Environment::updateEnvironment() {
-    //std::cout << mode << " " << finished << " " << run_counter << " " << generation_counter << " " << genome_counter << " " << steps << std::endl;
     if(!finished){
         if(run_counter < setting_n_runs){ // runs
             if(generation_counter < setting_n_generations){ // generation
@@ -286,7 +285,7 @@ void Environment::finished_genome() {
         float current_avg_fitness = current_fitness / (float)(std::stoi(settings["n_steps_per_genome_int"]) * std::stoi(settings["n_agents_int"]));
         current_fitness = 0.0;
         genome_fitnesses.push_back(current_avg_fitness);
-        std::cout << "Exp ID " << run_counter << ": Generation " << generation_counter << "; Genome " << genome_counter << "; Fitness " << current_avg_fitness << std::endl;
+        std::cout << "Exp ID " << expId << ": Generation " << generation_counter << "; Genome " << genome_counter << "; Fitness " << current_avg_fitness << std::endl;
         genome_counter++;
         if(genome_counter < setting_n_genomes){
             next_genome = population_genomes[genome_counter];
@@ -345,7 +344,7 @@ void Environment::save_generation_stats(std::vector<int> sorted_indices) {
     data_rotation.clear();
 
 
-    std::cout << "Experiment "<< run_counter << ": Finished generation " << generation_counter << std::endl;
+    std::cout << "Experiment "<< expId << ": Finished generation " << generation_counter << std::endl;
     lock.unlock();
 }
 
@@ -431,7 +430,7 @@ void Environment::finished_run() {
     }
     file.close();
 
-    std::cout << "Experiment "<< run_counter << ": Finished run " << run_counter << std::endl;
+    std::cout << "Experiment "<< expId << ": Finished run " << run_counter << std::endl;
     lock.unlock();
     population_genomes = population_genomes_backup;
 
@@ -644,7 +643,7 @@ std::vector<Agent *> &Environment::getAgents(){
 }
 
 void Environment::reset(){
-    std::cout << "Resetting experiment " << run_counter << "." << std::endl;
+    std::cout << "Resetting experiment " << expId << "." << std::endl;
     for (auto const& a : agents){
         delete a;
     }

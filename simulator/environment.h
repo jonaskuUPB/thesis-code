@@ -25,6 +25,8 @@ public:
     explicit Environment(std::string expName = "");
     virtual ~Environment();
 
+    std::string expId = "";
+
     //called when settings change
     void setupExperiment(std::map<std::string, std::string> s);
 
