@@ -15,12 +15,16 @@
 #include "Utils.h"
 
 std::mutex Environment::cout_mutex;
-int Environment::run_counter = 0;
-std::string Environment::current_folder = "";
+//int Environment::run_counter = 0;
+//std::string Environment::exp_folder = "";
 
 //Environment::Environment(QWidget *parent): QWidget(parent)
+/*
+ * Createa an environment for a single experiment. An experiment consists of one or more runs that are executed with the same settings.
+ */
 Environment::Environment(std::string expName /*= ""*/)
 {
+    run_counter =0;
     // static class id
     run_id = run_counter++;
     // first experiment creates parent folder
@@ -31,23 +35,33 @@ Environment::Environment(std::string expName /*= ""*/)
         std::strftime(mbstr, sizeof(mbstr), "%Y_%m_%d-%H_%M_%S/", std::localtime(&t));
         std::string s(mbstr);
         s = expName + "-" + s;
-        current_folder = base_path.append(s);
-        int dir_error = mkdir(current_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        exp_folder = base_path.append(s);
+        int dir_error = mkdir(exp_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         if (-1 == dir_error){
-            std::cout << "Error creating directory:" << current_folder << std::endl;
+            std::cout << "Error creating directory:" << exp_folder << std::endl;
         }
     }
 
-    // experiment folder based on experiment id
-    exp_folder = current_folder + std::to_string(run_id) + "/";
-    genome_folder = exp_folder + "genomes/";
-    trajectory_folder = exp_folder + "trajectory/";
-    stats_folder = exp_folder + "stats/";
-    settings_folder = exp_folder;
+    setup_run_folder();
 
-    int dir_error = mkdir(exp_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    cl = new ContactListener();
+
+}
+
+Environment::~Environment() {
+}
+
+void Environment::setup_run_folder() {
+    // experiment folder based on experiment id
+    run_folder = exp_folder + "run_" + std::to_string(run_id) + "/";
+    genome_folder = run_folder + "genomes/";
+    trajectory_folder = run_folder + "trajectory/";
+    stats_folder = run_folder + "stats/";
+    settings_folder = run_folder;
+
+    int dir_error = mkdir(run_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     if (-1 == dir_error){
-        std::cout << "Error creating directory:" << exp_folder << std::endl;
+        std::cout << "Error creating directory:" << run_folder << std::endl;
     }
     dir_error = mkdir(genome_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     if (-1 == dir_error){
@@ -65,16 +79,10 @@ Environment::Environment(std::string expName /*= ""*/)
     //    if (-1 == dir_error){
     //        std::cout << "Error creating directory:" << settings_folder << std::endl;
     //    }
-
-    cl = new ContactListener();
-
-}
-
-Environment::~Environment() {
 }
 
 void Environment::setupExperiment(std::map<std::string, std::string> s){
-    std::cout << "Setting up experiment " << run_id << "."  << std::endl;
+    std::cout << "Setting up experiment " << run_folder << "."  << std::endl;
     settings = s;
     std::string m_rate = settings["mutation_rate_float"];
     std::replace(m_rate.begin(),m_rate.end(),',','.');
@@ -410,7 +418,6 @@ void Environment::finished_generation() {
     start_gen_time = end_gen_time;
 }
 
-
 //called after finishing all generations of a single run
 void Environment::finished_run() {
     generation_counter = 0;
@@ -418,7 +425,7 @@ void Environment::finished_run() {
     std::string fname = "run_" + std::to_string(run_counter);
     fname.append("_exp-id_" + std::to_string(run_id));
     std::ofstream file;
-    file.open(current_folder+fname);
+    file.open(exp_folder+fname);
     int gen = 0;
     for(auto const& generation : generation_fitnesses){
         file << ++gen;
@@ -435,6 +442,10 @@ void Environment::finished_run() {
 
     run_fitnesses.push_back(generation_fitnesses);
     generation_fitnesses.clear();
+
+    //setup the new folder for the second run
+    run_id++;
+    setup_run_folder();
 }
 
 //called after finishing all runs of an experiment

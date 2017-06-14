@@ -80,11 +80,11 @@ public:
     std::map<int, float> distance;
 
     std::string base_path = "results/";
-    static std::string current_folder;
+    std::string exp_folder;
     std::string genome_folder;
     std::string trajectory_folder;
     std::string settings_folder;
-    std::string exp_folder;
+    std::string run_folder;
     std::string stats_folder;
 
     std::map<std::string, std::string> settings;
@@ -94,6 +94,8 @@ public:
 
     void generateRandomANNs();
     void setPopulation(std::vector<std::vector<float>> genomes);
+
+    void setup_run_folder();
 
 signals:
     void genomeFinished();
@@ -122,7 +124,7 @@ protected:
     int setting_type_evo = 0;
     int seed = 0;
     static std::mutex cout_mutex;
-    static int run_counter;
+    //static int run_counter;
     float mutation_rate = 0.1;
     int action_layer_start = 0;
 
