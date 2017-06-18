@@ -70,10 +70,6 @@ void Environment::setup_run_folder() {
     if (-1 == dir_error){
         std::cout << "Error creating directory:" << stats_folder << std::endl;
     }
-    //    dir_error = mkdir(settings_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-    //    if (-1 == dir_error){
-    //        std::cout << "Error creating directory:" << settings_folder << std::endl;
-    //    }
 }
 
 void Environment::setupExperiment(std::map<std::string, std::string> s){
@@ -134,8 +130,6 @@ void Environment::setupExperiment(std::map<std::string, std::string> s){
         int angle = ((uniform_rand(mt) / (RAND_MAX / 360.0f)) - 180.0f);
         agents.push_back(new Agent(_world, controller, b2Vec2(dx, dy), 20.0f, angle, 1.0f));
     }
-
-    //wall = new Wall(_world, WIDTH/2, HEIGHT/2, 20, 100);
 
     population_genomes.clear();
     if(settings["type_evo_int"] == "1"){ // homogen
@@ -380,12 +374,7 @@ void Environment::finished_generation() {
         std::vector<std::vector<float>> temp_genomes;
         if(mode==1){
             for(int elitist = 0; elitist < setting_elitism; elitist++){
-                //                                int max_index = 0;
-                //                                auto max_f = std::max_element(this_genome_fitness.begin(), this_genome_fitness.end());
-                //                                max_index = std::distance(this_genome_fitness.begin(), max_f);
-                //                              std::cout << "exp_id: " << exp_id << "\t" << elitist << "\t" << max_index << "\t" << this_genome_fitness.size() << std::endl;
                 temp_genomes.push_back(population_genomes[sorted_indices[elitist]]);
-                //                              this_genome_fitness[max_index] = 0.0;
             }
             for(int i = 0; i < (std::stoi(settings["n_genomes_int"])-std::stoi(settings["elitism_int"])); i++){
                 temp_genomes.push_back(mutateP(population_genomes[rouletteWheelSelection(genome_fitnesses)],mutation_rate));
@@ -446,47 +435,6 @@ void Environment::finished_run() {
 void Environment::finished_experiment(){
     finished = true;
     run_counter = 0;
-}
-
-void Environment::updateWithoutEvoProcess(){
-    _world->Step(1.0f / 60.0f, 32, 16);
-    for(auto const& a : agents){
-        a->update();
-    }
-
-
-
-    if(logging){
-        if(logging_steps >  0){
-            std::cout << "logging step " << logging_steps << std::endl;
-
-            saveActions();
-            //            calculateDistances();
-
-            logging_steps--;
-        }else{
-
-            std::string fname = "actions";
-            std::ofstream file;
-            file.open(trajectory_folder+fname);
-            for(auto &line : log_actions){
-                file << line[0] << " " << line[1] << "\n";
-            }
-            file.close();
-            log_actions.clear();
-            saveCoveredDistance();
-
-            logging_steps = 3000;
-            logging = false;
-        }
-    }
-}
-
-void Environment::doWorldStep(){
-    _world->Step(1.0f / 60.0f, 32, 16);
-    for(auto const& a : agents){
-        a->update();
-    }
 }
 
 float Environment::getAverageSpeed(){
@@ -606,21 +554,6 @@ void Environment::calculateClusters(){
             }
         }
     }
-
-    //    int sum = 0;
-    //    for (auto c : cluster){
-    //        sum += c.size();
-    //    }
-    //    std::cout << sum << std::endl;
-
-    //    for (auto c : cluster){
-    //        std::cout << "{";
-    //        for (auto n : c){
-    //            std::cout << n << " ";
-    //        }
-    //        std::cout << "}";
-    //    }
-    //    std::cout << std::endl;
 }
 
 void Environment::mousePressEvent(QMouseEvent *e){
@@ -679,49 +612,21 @@ std::vector<float> Environment::mutateP(std::vector<float> genome, float f){
 
 int Environment::rouletteWheelSelection(std::vector<float> fitnesses){
 
-    //    if(exp_id == 1){
-    //        std::cout << "############################" << std::endl;
-    //        for(auto &f : fitnesses){
-    //            std::cout << f << "\t";
-    //        }
-    //        std::cout << std::endl;
-    //    }
-
-
     std::vector<float> temp_fitnesses = fitnesses;
     float sum_fitnesses = 0.0;
 
     auto min_f = std::min_element(temp_fitnesses.begin(), temp_fitnesses.end());
-
-    //    if(exp_id == 1){
-    //        std::cout << "min f: " << *min_f << std::endl;
-    //    }
 
     for(int i = 0; i <temp_fitnesses.size(); i++){
         temp_fitnesses[i] -= *min_f;
         sum_fitnesses += temp_fitnesses[i];
     }
 
-    //    if(exp_id == 1){
-    //        for(auto &f : temp_fitnesses){
-    //            std::cout << f << "\t";
-    //        }
-    //        std::cout << std::endl;
-    //        std::cout << "sum: " << sum_fitnesses << std::endl;
-    //    }
-
     std::uniform_real_distribution<float> rnd(0.0,1.0);
     float rnd_value = rnd(mt) * sum_fitnesses;
 
-    //    if(exp_id == 1){
-    //        std::cout << "rnd: " << rnd_value << std::endl;
-    //    }
-
     for(unsigned int i = 0; i < temp_fitnesses.size(); i++){
         rnd_value -= temp_fitnesses[i];
-        //        if(exp_id == 1){
-        //            std::cout << "rnd "<< i << ": " << rnd_value << std::endl;
-        //        }
         if(rnd_value <= 0.0) return i;
     }
 

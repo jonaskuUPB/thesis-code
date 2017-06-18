@@ -57,12 +57,21 @@ public:
     void savePoseAndSpeed();
     void saveActions();
     void saveCoveredDistance();
+    float getAverageSpeed();
+    float getAverageDeltaAngle();
+    float getAverageAction();
     std::vector<std::vector<float>> data_action;
     std::vector<std::vector<float>> data_speed;
     std::vector<std::vector<float>> data_rotation;
+    std::vector<std::vector<int>> data_cluster_size;
+    std::vector<std::vector<float>> data_distance;
+    std::vector<std::vector<float>> data_k_distance;
     std::vector<float> temp_actions_per_gen;
     std::vector<float> temp_speeds_per_gen;
     std::vector<float> temp_rotations_per_gen;
+    std::vector<int> temp_cluster_size_per_gen;
+    std::vector<float> temp_distance_per_gen;
+    std::vector<float> temp_k_distance_per_gen;
 
     //logging
     bool logging = false;
@@ -99,9 +108,6 @@ public:
     std::set<std::set<int>> cluster;
     std::map<int, float> distance;
     int genome_counter = 0;
-    float getAverageSpeed();
-    float getAverageDeltaAngle();
-    float getAverageAction();
     void setGenomeForAllAgents(std::vector<float> genome);
     void printResults();
     bool finished = false;

@@ -44,7 +44,7 @@ void ThreadClass::ThreadEvoMain()
         env->updateEnvironment();
     }
 
-    if(post_evaluation){
+    /*if(post_evaluation){
         //std::cout << "Starting simulation of experiment " << env->expId << std::endl;
         std::vector<std::vector<float>> data_action;
         std::vector<std::vector<float>> data_speed;
@@ -155,7 +155,7 @@ void ThreadClass::ThreadEvoMain()
         }
         file_stream.close();
         data_rotation.clear();
-    }
+    }*/
 }
 
 void ThreadClass::printResults(){
