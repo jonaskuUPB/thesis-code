@@ -40,6 +40,8 @@ public:
     QVector<QPoint> trace;
     void clicked();
 
+    float getDistanceToInitialPosition();
+
 protected:
     std::map<int,Agent*> sensedEntities;
     std::map<int,bool> sensedWalls;

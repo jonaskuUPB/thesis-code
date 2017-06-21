@@ -482,6 +482,11 @@ std::map<int, Agent*> &Agent::getSensedEntities(){
     return sensedEntities;
 }
 
+float Agent::getDistanceToInitialPosition() {
+    b2Vec2 initial_pos(initial_x, initial_y);
+    return distanceTo(initial_pos);
+}
+
 float Agent::distanceTo(b2Vec2 target){
     float d = 0.0;
     d = b2Distance(body->GetPosition(), target);
