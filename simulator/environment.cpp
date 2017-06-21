@@ -244,6 +244,7 @@ void Environment::updateEnvironment() {
                             temp_actions_per_gen.push_back(getAverageAction());
                             temp_speeds_per_gen.push_back(getAverageSpeed());
                             temp_rotations_per_gen.push_back(getAverageDeltaAngle());
+                            temp_k_distance_per_gen.push_back(getAverageKDistance());
                         }
                     }else{ // steps/genome finished
                         finished_genome();
@@ -264,10 +265,12 @@ void Environment::save_genome_stats(){
     data_action.push_back(temp_actions_per_gen);
     data_speed.push_back(temp_speeds_per_gen);
     data_rotation.push_back(temp_rotations_per_gen);
+    data_k_distance.push_back(temp_k_distance_per_gen);
 
     temp_actions_per_gen.clear();
     temp_speeds_per_gen.clear();
     temp_rotations_per_gen.clear();
+    temp_k_distance_per_gen.clear();
 }
 
 void Environment::finished_genome() {
@@ -337,6 +340,15 @@ void Environment::save_generation_stats(std::vector<int> sorted_indices) {
     file_stream.close();
     data_rotation.clear();
 
+    std::string kdist_fname = stats_folder + "k_distance_gen" + std::to_string(genome_counter);
+    file_stream.open(kdist_fname);
+    for(unsigned int i = 0; i < sorted_indices.size(); i++){
+        for(auto v : data_k_distance[sorted_indices[i]])
+            file_stream << v << " ";
+        file_stream << "\n";
+    }
+    file_stream.close();
+    data_rotation.clear();
 
     std::cout << "Experiment "<< expId << ": Finished generation " << generation_counter << std::endl;
     lock.unlock();
@@ -464,6 +476,12 @@ float Environment::getAverageDeltaAngle(){
     }
 
     return avg_angle / (float)agents.size();
+}
+
+float Environment::getAverageKDistance() {
+    float avg_k_dist = 0;
+    //TODO
+    return avg_k_dist;
 }
 
 void Environment::setGenomeForAllAgents(std::vector<float> genome){

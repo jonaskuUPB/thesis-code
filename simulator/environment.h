@@ -60,6 +60,7 @@ public:
     float getAverageSpeed();
     float getAverageDeltaAngle();
     float getAverageAction();
+    float getAverageKDistance();
     std::vector<std::vector<float>> data_action;
     std::vector<std::vector<float>> data_speed;
     std::vector<std::vector<float>> data_rotation;
