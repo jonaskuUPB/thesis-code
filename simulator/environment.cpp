@@ -216,7 +216,6 @@ void Environment::printResults(){
                 s.append("\t").append(QString::number(gen));
             }
             s.append("\t").append("Average: ").append(QString::number(avg/std::stoi(settings["n_genomes_int"]))).append("\n");
-            std::cout << s.toStdString();
         }
     }
 }
@@ -357,17 +356,18 @@ void Environment::save_generation_stats(std::vector<int> sorted_indices) {
     file_stream.close();
     data_rotation.clear();
 
-    std::string kdist_fname = stats_folder + "k_distance_gen" + std::to_string(generation_counter);
+    std::string kdist_fname = stats_folder + "k_distance_gen_" + std::to_string(generation_counter);
     file_stream.open(kdist_fname);
     for(unsigned int i = 0; i < sorted_indices.size(); i++){
-        for(auto v : data_k_distance[sorted_indices[i]])
+        for(auto v : data_k_distance[sorted_indices[i]]){
             file_stream << v << " ";
+        }
         file_stream << "\n";
     }
     file_stream.close();
     data_k_distance.clear();
 
-    std::string dist_fname = stats_folder + "distance_covered_gen" + std::to_string(generation_counter);
+    std::string dist_fname = stats_folder + "distance_covered_gen_" + std::to_string(generation_counter);
     file_stream.open(dist_fname);
     for(unsigned int i = 0; i < sorted_indices.size(); i++){
         for(auto v : data_distance[sorted_indices[i]])
@@ -377,7 +377,7 @@ void Environment::save_generation_stats(std::vector<int> sorted_indices) {
     file_stream.close();
     data_distance.clear();
 
-    std::string cluster_fname = stats_folder + "cluster_size_gen" + std::to_string(generation_counter);
+    std::string cluster_fname = stats_folder + "cluster_size_gen_" + std::to_string(generation_counter);
     file_stream.open(cluster_fname);
     for(unsigned int i = 0; i < sorted_indices.size(); i++){
         for(auto v : data_cluster_size[sorted_indices[i]])
@@ -477,7 +477,9 @@ void Environment::finished_run() {
 
     //setup the new folder for the next run
     run_counter++;
-    setup_run_folder();
+    if(run_counter < setting_n_runs) {
+        setup_run_folder();
+    }
 }
 
 //called after finishing all runs of an experiment
