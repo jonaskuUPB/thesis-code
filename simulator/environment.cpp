@@ -475,6 +475,8 @@ void Environment::finished_run() {
     run_fitnesses.push_back(generation_fitnesses);
     generation_fitnesses.clear();
 
+    //TODO: Set initial population
+
     //setup the new folder for the next run
     run_counter++;
     if(run_counter < setting_n_runs) {

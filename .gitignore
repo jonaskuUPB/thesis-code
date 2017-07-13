@@ -6,6 +6,7 @@ Makefile
 # Ignore libraries
 Box2D/
 FANN/
+NSGA2/
 
 # Ignore editor files
 Simulator.pro.user
