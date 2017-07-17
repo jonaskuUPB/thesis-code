@@ -1,0 +1,3 @@
+[submodule "NSGA2"]
+	path = NSGA2
+	url = https://github.com/jonaskuUPB/nsga2.git
