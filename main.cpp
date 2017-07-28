@@ -34,8 +34,17 @@ int guiRun(int argc, char** argv){
 int main(int argc, char** argv)
 {
 
+    // read default settings from file
+    default_settings = Utils::readSettingsFrom("results/default_settings");
+    srand(time(NULL));
+    default_settings["seed_int"] = std::to_string(Utils::newSeed());
+
+    // create environment with default settings
+    Environment* env = new Environment();
+    env->setupExperiment(default_settings);
+
     NSGA2Type nsga2Params;
-    void *inp = NULL;
+    void *inp = env;
     void *out = NULL;
 
     double *minReal = (double *)malloc(2*sizeof(double));
@@ -50,28 +59,25 @@ int main(int argc, char** argv)
     double *maxBin = (double *)malloc(1*sizeof(double));
 
     nsga2Params = SetParameters(0.5, 100, 150, 2, 2, 2, minReal, maxReal, 0.9, 0.5, 10, 20, 0, numBits, minBin, maxBin, 0, 0, 1, 1, 2, 0, 0, 0, 0);
-    InitNSGA2(&nsga2Params, inp, out);
-    NSGA2(&nsga2Params, inp, out);
+    InitNSGA2(&nsga2Params, inp, out, env->setNSGA2Genome);
+    NSGA2(&nsga2Params, inp, out, env->setNSGA2Genome);
     exit(0);
 
-    // read default settings from file
-    default_settings = Utils::readSettingsFrom("results/default_settings");
-    srand(time(NULL));
-    default_settings["seed_int"] = std::to_string(Utils::newSeed());
-        if(gui){
-            guiRun(argc, argv);
-        }else{
-            //Run an evolution
-            ThreadClass* t = new ThreadClass();
-            t->SetupEnvironment("evolution", default_settings);
-            t->StartEvoProcess();
-            t->Join();
-            //Run a replay
-            ThreadClass* t2 = new ThreadClass();
-            t2->SetupEnvironment("control", default_settings);
-            t2->StartReplayProcess();
-            t2->Join();
-            //finally turn of the computer
-            //system("shutdown -P now");
-        }
+
+    if(gui){
+        guiRun(argc, argv);
+    }else{
+        //Run an evolution
+        ThreadClass* t = new ThreadClass();
+        t->SetupEnvironment("evolution", default_settings);
+        t->StartEvoProcess();
+        t->Join();
+        //Run a replay
+        ThreadClass* t2 = new ThreadClass();
+        t2->SetupEnvironment("control", default_settings);
+        t2->StartReplayProcess();
+        t2->Join();
+        //finally turn of the computer
+        //system("shutdown -P now");
+    }
 }
