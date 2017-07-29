@@ -20,6 +20,8 @@
 
 class Environment : QObject
 {
+    Q_OBJECT
+
 public:
     //constructor and destructor
     explicit Environment(std::string expName = "");

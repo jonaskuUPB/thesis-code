@@ -17,7 +17,7 @@
 std::mutex Environment::cout_mutex;
 
 /*
- * Createa an environment for a single experiment. An experiment consists of one or more runs that are executed with the same settings.
+ * Create an environment for a single experiment. An experiment consists of one or more runs that are executed with the same settings.
  */
 Environment::Environment(std::string expName /*= ""*/)
 {
@@ -323,6 +323,7 @@ void Environment::finished_genome() {
     for(auto const& a : agents){
         a->reset_to_initial_position();
     }
+    emit genomeFinished();
 }
 
 void Environment::save_generation_stats(std::vector<int> sorted_indices) {
@@ -464,6 +465,7 @@ void Environment::finished_generation() {
     double result= difftime(end_gen_time, start_gen_time);
     std::cout << "Generation took " << result << " seconds\n";
     start_gen_time = end_gen_time;
+    emit generationFinished();
 }
 
 //called after finishing all generations of a single run
@@ -498,6 +500,7 @@ void Environment::finished_run() {
     if(run_counter < setting_n_runs) {
         setup_run_folder();
     }
+    emit runFinished();
 }
 
 //called after finishing all runs of an experiment
