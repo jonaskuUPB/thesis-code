@@ -120,7 +120,22 @@ void EnvironmentWidget::setLogging(){
 }
 
 void EnvironmentWidget::setEnvironmentMode(int mode){
-    env->mode = mode;
+    switch (mode) {
+    case 0:
+        env->initGenomeReplay();
+        break;
+    case 1:
+        env->initEvolution();
+        break;
+    case 2:
+        env->initExperimentReplay();
+        break;
+    case 3:
+        env->initMultiObjectiveOptimization();
+        break;
+    default:
+        break;
+    }
 }
 
 void EnvironmentWidget::setExpFolder(std::string path) {

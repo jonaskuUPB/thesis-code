@@ -192,6 +192,22 @@ void Environment::generateRandomANNs(){
     }
 }
 
+void Environment::initGenomeReplay() {
+    mode = 0;
+}
+
+void Environment::initEvolution() {
+    mode = 1;
+}
+
+void Environment::initExperimentReplay() {
+    mode = 2;
+}
+
+void Environment::initMultiObjectiveOptimization() {
+    mode = 3;
+}
+
 void Environment::setSettings(std::map<std::string, std::string> settings){
     this->settings = settings;
     reset();
@@ -700,4 +716,14 @@ int Environment::rouletteWheelSelection(std::vector<float> fitnesses){
     }
 
     return temp_fitnesses.size() - 1;
+}
+
+void Environment::internal_setNSGA2Genome(double *xreal, double *xbin, int **gene, double *obj, double *constr, void *inp, void *out) {
+    std::cout << "Settting NSGA internally" << std::endl;
+}
+
+void Environment::setNSGA2Genome(double *xreal, double *xbin, int **gene, double *obj, double *constr, void* inp, void* out) {
+    std::cout << "Settting NSGA" << std::endl;
+    Environment *env = static_cast<Environment*>(inp);
+    env->internal_setNSGA2Genome(xreal, xbin, gene, obj, constr, inp, out);
 }

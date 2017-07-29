@@ -13,12 +13,12 @@ void ThreadClass::SetupEnvironment(std::string expName, std::map<std::string, st
 
 void ThreadClass::StartEvoProcess()
 {
-    env->mode = 1;
+    env->initEvolution();
     t = std::thread(&ThreadClass::ThreadEvoMain,this);
 }
 
 void ThreadClass::StartReplayProcess(){
-    env->mode = 2;
+    env->initExperimentReplay();
     env->generateRandomANNs();
     QString path = QString();
     path.append(QString::fromStdString(env->genome_folder));

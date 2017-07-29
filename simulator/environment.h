@@ -36,43 +36,14 @@ public:
     std::map<std::string, std::string> getSettings();
     std::map<std::string, std::string> settings;
 
+    void initEvolution();
+    void initMultiObjectiveOptimization();
+    void initGenomeReplay();
+    void initExperimentReplay();
+
     //methods and attributes maintaining the population
-    std::vector<float>mutate(std::vector<float> genome, float f);
-    std::vector<float>mutateP(std::vector<float> genome, float f);
-    int rouletteWheelSelection(std::vector<float> fitnesses);
     void generateRandomANNs();
     void setPopulation(std::vector<std::vector<float>> genomes);
-    std::vector<std::vector<float>> population_genomes;
-    std::vector<std::vector<float>> population_genomes_backup;
-    std::vector<std::vector<std::vector<float>>> all_genomes;
-
-    //attributes for the fitness
-    std::vector<std::vector<std::vector<float>>> run_fitnesses;
-    std::vector<std::vector<float>> generation_fitnesses;
-    std::vector<float> genome_fitnesses;
-    float current_fitness = 0.0;
-
-    //methods to calculate stats
-    void calculateClusters();
-    void savePoseAndSpeed();
-    void saveActions();
-    void saveCoveredDistance();
-    float getAverageSpeed();
-    float getAverageDeltaAngle();
-    float getAverageAction();
-    float getAverageKDistance();
-    std::vector<std::vector<float>> data_action;
-    std::vector<std::vector<float>> data_speed;
-    std::vector<std::vector<float>> data_rotation;
-    std::vector<std::vector<int>> data_cluster_size;
-    std::vector<std::vector<float>> data_distance;
-    std::vector<std::vector<float>> data_k_distance;
-    std::vector<float> temp_actions_per_gen;
-    std::vector<float> temp_speeds_per_gen;
-    std::vector<float> temp_rotations_per_gen;
-    std::vector<int> temp_cluster_size_per_gen;
-    std::vector<float> temp_distance_per_gen;
-    std::vector<float> temp_k_distance_per_gen;
 
     //logging
     bool logging = false;
@@ -89,30 +60,27 @@ public:
     std::string run_folder;
     std::string stats_folder;
 
-    int mode = 1; //0=play single genome; 1=evolution; 2=replay_experiment
-
     //interaction
     void mousePressEvent(QMouseEvent *e);
     void clickedAgent();
 
-    //updateMethods: TODO delete unecessary ones
+    //updateMethod
     void updateEnvironment();
-    void updateWithoutEvoProcess();
-    void doWorldStep();
 
+
+    void saveCoveredDistance();
 
     //MISC:
     std::vector<Agent*> &getAgents();
     b2World* getWorld();
     bool isRunning();
     Wall *wall;
-    std::set<std::set<int>> cluster;
-    std::map<int, float> distance;
-    int genome_counter = 0;
     void setGenomeForAllAgents(std::vector<float> genome);
     void printResults();
     bool finished = false;
     bool environment_initialized = false;
+    void internal_setNSGA2Genome(double *xreal, double *xbin, int **gene, double *obj, double *constr, void* inp, void* out);
+    static void setNSGA2Genome(double *xreal, double *xbin, int **gene, double *obj, double *constr, void* inp, void* out);
 
 signals:
     void genomeFinished();
@@ -151,6 +119,51 @@ protected:
     int action_layer_start = 0;
 
     std::mt19937 mt;
+
+    //maintaining population
+    std::vector<float>mutate(std::vector<float> genome, float f);
+    std::vector<float>mutateP(std::vector<float> genome, float f);
+    int rouletteWheelSelection(std::vector<float> fitnesses);
+    std::vector<std::vector<float>> population_genomes;
+    std::vector<std::vector<float>> population_genomes_backup;
+    std::vector<std::vector<std::vector<float>>> all_genomes;
+
+    //methods to calculate stats
+    void calculateClusters();
+    void savePoseAndSpeed();
+    void saveActions();
+    float getAverageSpeed();
+    float getAverageDeltaAngle();
+    float getAverageAction();
+    float getAverageKDistance();
+    std::vector<std::vector<float>> data_action;
+    std::vector<std::vector<float>> data_speed;
+    std::vector<std::vector<float>> data_rotation;
+    std::vector<std::vector<int>> data_cluster_size;
+    std::vector<std::vector<float>> data_distance;
+    std::vector<std::vector<float>> data_k_distance;
+    std::vector<float> temp_actions_per_gen;
+    std::vector<float> temp_speeds_per_gen;
+    std::vector<float> temp_rotations_per_gen;
+    std::vector<int> temp_cluster_size_per_gen;
+    std::vector<float> temp_distance_per_gen;
+    std::vector<float> temp_k_distance_per_gen;
+
+    //attributes for the fitness
+    std::vector<std::vector<std::vector<float>>> run_fitnesses;
+    std::vector<std::vector<float>> generation_fitnesses;
+    std::vector<float> genome_fitnesses;
+    float current_fitness = 0.0;
+
+    int mode = 1; //0=play single genome; 1=evolution; 2=replay_experiment; 3=MOO
+
+    std::set<std::set<int>> cluster;
+    std::map<int, float> distance;
+    int genome_counter = 0;
+
+    //setting and reading of current genome for concurrent threads
+    bool genomeReadyToSet;
+    bool genomeEvaluationFinished;
 
 private:
     void finished_genome();
