@@ -40,7 +40,6 @@ Environment::Environment(std::string expName /*= ""*/)
     setup_run_folder();
 
     cl = new ContactListener();
-
 }
 
 Environment::~Environment() {
@@ -721,8 +720,26 @@ int Environment::rouletteWheelSelection(std::vector<float> fitnesses){
     return temp_fitnesses.size() - 1;
 }
 
+void Environment::NSGA2_testproblem() {
+    obj_NSGA2[0] = 4.0*(xreal_NSGA2[0]*xreal_NSGA2[0] + xreal_NSGA2[1]*xreal_NSGA2[1]);
+    obj_NSGA2[1] = pow((xreal_NSGA2[0]-5.0),2.0) + pow((xreal_NSGA2[1]-5.0),2.0);
+    constr_NSGA2[0] = 1.0 - (pow((xreal_NSGA2[0]-5.0),2.0) + xreal_NSGA2[1]*xreal_NSGA2[1])/25.0;
+    constr_NSGA2[1] = (pow((xreal_NSGA2[0]-8.0),2.0) + pow((xreal_NSGA2[1]+3.0),2.0))/7.7 - 1.0;
+}
+
 void Environment::internal_setNSGA2Genome(double *xreal, double *xbin, int **gene, double *obj, double *constr, void *inp, void *out) {
-    std::cout << "Settting NSGA internally" << std::endl;
+    std::unique_lock<std::mutex> lock(genomeSetMutex);
+    xreal_NSGA2 = xreal;
+    xbin_NSGA2 = xbin;
+    gene_NSGA2 = gene;
+    obj_NSGA2 = obj;
+    constr_NSGA2 = constr;
+    genomeSetCondition.notify_one();
+    genomeIsSet = true;
+
+    NSGA2_testproblem();
+    lock.unlock();
+    return;
 }
 
 void Environment::setNSGA2Genome(double *xreal, double *xbin, int **gene, double *obj, double *constr, void* inp, void* out) {

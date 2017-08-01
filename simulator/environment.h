@@ -12,6 +12,7 @@
 #include <iostream>
 #include <mutex>
 #include <set>
+#include <condition_variable>
 
 #include "contactlistener.h"
 
@@ -163,10 +164,6 @@ protected:
     std::map<int, float> distance;
     int genome_counter = 0;
 
-    //setting and reading of current genome for concurrent threads
-    bool genomeReadyToSet;
-    bool genomeEvaluationFinished;
-
 private:
     void finished_genome();
     void finished_generation();
@@ -179,6 +176,20 @@ private:
     void save_generation_stats(std::vector<int> sorted_indices);
 
     std::time_t start_gen_time;
+
+    //setting and reading of current genome for concurrent threads
+    bool genomeIsSet;
+    std::mutex genomeSetMutex;
+    std::condition_variable genomeSetCondition;
+    bool genomeEvaluationFinished;
+    std::mutex genomeEvalFinishedMutex;
+
+    void NSGA2_testproblem();
+    double *xreal_NSGA2;
+    double *xbin_NSGA2;
+    int **gene_NSGA2;
+    double *obj_NSGA2;
+    double *constr_NSGA2;
 
 };
 
