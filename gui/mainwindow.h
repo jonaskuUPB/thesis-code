@@ -29,7 +29,6 @@ public slots:
     void avgFitnessChanged(float f);
 
 private slots:
-    void on_playPushButton_clicked();
     void on_treeView_doubleClicked(const QModelIndex &index);
     void on_pb_LogData_released();
 
@@ -44,6 +43,8 @@ private slots:
     void on_RunExperimentButton_clicked();
 
     void on_pushButtonGenerateRandomANNs_clicked();
+
+    void on_pushButton_NewRun_clicked();
 
 private:
     Ui::MainWindow *ui;

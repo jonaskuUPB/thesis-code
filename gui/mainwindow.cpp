@@ -13,7 +13,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //set signals for buttons and timeouts
     connect(timer, SIGNAL(timeout()), ui->environmentWidget, SLOT(doStep()));
-    connect(ui->pushButton_Reset, SIGNAL(clicked()), this, SLOT(resetEnvironment()));
     connect(ui->pushButton_SetupExperiment, SIGNAL(clicked()), this, SLOT(readAndSetSettingsfromUi()));
     connect(ui->environmentWidget, SIGNAL(initEnvWithSettingsFromUi()), this, SLOT(readAndSetSettingsfromUi()));
     connect(ui->pushButton_NewSeed, SIGNAL(clicked()), this, SLOT(newSeed()));
@@ -37,18 +36,10 @@ void MainWindow::toggle_simulation() {
     start_pushed = !start_pushed;
     if(start_pushed){
         timer->start();
-        ui->playPushButton->setText("Pause");
     }
     else{
         timer->stop();
-        ui->playPushButton->setText("Play");
     }
-}
-
-void MainWindow::on_playPushButton_clicked()
-{
-    ui->environmentWidget->evolution = ui->checkBox->isChecked();
-    toggle_simulation();
 }
 
 void MainWindow::setEnvironment(Environment* env){
@@ -210,10 +201,19 @@ void MainWindow::on_pushButtonLoadExperiment_clicked()
 
 void MainWindow::on_RunExperimentButton_clicked()
 {
-    startSimulation(1);
+    if(ui->radioButton_Evolution->isChecked())
+        startSimulation(1);
+    else if (ui->radioButton_NSGA2->isChecked())
+        startSimulation(3);
 }
 
 void MainWindow::on_pushButtonGenerateRandomANNs_clicked()
 {
     ui->environmentWidget->getEnvironment()->generateRandomANNs();
+}
+
+void MainWindow::on_pushButton_NewRun_clicked()
+{
+    //TODO: Make new run
+    //ui->environmentWidget->getEnvironment()->finished_run();
 }

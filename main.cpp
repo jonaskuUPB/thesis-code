@@ -13,7 +13,7 @@
 #include <sys/types.h>
 #include "nsga2.h"
 
-bool gui = false;
+bool gui = true;
 std::map<std::string, std::string> default_settings;
 
 int guiRun(int argc, char** argv){
@@ -62,7 +62,6 @@ int main(int argc, char** argv)
     InitNSGA2(&nsga2Params, inp, out, env->setNSGA2Genome);
     NSGA2(&nsga2Params, inp, out, env->setNSGA2Genome);
     exit(0);
-
 
     if(gui){
         guiRun(argc, argv);
