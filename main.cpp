@@ -14,6 +14,7 @@
 #include "nsga2.h"
 
 bool gui = true;
+bool nsga = true;
 std::map<std::string, std::string> default_settings;
 
 int guiRun(int argc, char** argv){
@@ -39,30 +40,30 @@ int main(int argc, char** argv)
     srand(time(NULL));
     default_settings["seed_int"] = std::to_string(Utils::newSeed());
 
-    // create environment with default settings
-    Environment* env = new Environment();
-    env->setupExperiment(default_settings);
+    if(nsga){// create environment with default settings
+        Environment* env = new Environment();
+        env->setupExperiment(default_settings);
 
-    NSGA2Type nsga2Params;
-    void *inp = env;
-    void *out = NULL;
+        NSGA2Type nsga2Params;
+        void *inp = env;
+        void *out = NULL;
 
-    double *minReal = (double *)malloc(2*sizeof(double));
-    minReal[0] = 0;
-    minReal[1] = 0;
-    double *maxReal = (double *)malloc(2*sizeof(double));
-    maxReal[0] = 5;
-    maxReal[1] = 3;
+        double *minReal = (double *)malloc(2*sizeof(double));
+        minReal[0] = 0;
+        minReal[1] = 0;
+        double *maxReal = (double *)malloc(2*sizeof(double));
+        maxReal[0] = 5;
+        maxReal[1] = 3;
 
-    int *numBits = (int *)malloc(1*sizeof(int));
-    double *minBin = (double *)malloc(1*sizeof(double));
-    double *maxBin = (double *)malloc(1*sizeof(double));
+        int *numBits = (int *)malloc(1*sizeof(int));
+        double *minBin = (double *)malloc(1*sizeof(double));
+        double *maxBin = (double *)malloc(1*sizeof(double));
 
-    nsga2Params = SetParameters(0.5, 100, 150, 2, 2, 2, minReal, maxReal, 0.9, 0.5, 10, 20, 0, numBits, minBin, maxBin, 0, 0, 1, 1, 2, 0, 0, 0, 0);
-    InitNSGA2(&nsga2Params, inp, out, env->setNSGA2Genome);
-    NSGA2(&nsga2Params, inp, out, env->setNSGA2Genome);
-    exit(0);
-
+        nsga2Params = SetParameters(0.5, 100, 150, 2, 2, 2, minReal, maxReal, 0.9, 0.5, 10, 20, 0, numBits, minBin, maxBin, 0, 0, 1, 1, 2, 0, 0, 0, 0);
+        InitNSGA2(&nsga2Params, inp, out, env->setNSGA2Genome);
+        NSGA2(&nsga2Params, inp, out, env->setNSGA2Genome);
+        exit(0);
+    }
     if(gui){
         guiRun(argc, argv);
     }else{

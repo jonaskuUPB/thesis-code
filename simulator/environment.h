@@ -183,6 +183,7 @@ private:
     std::condition_variable genomeSetCondition;
     bool genomeEvaluationFinished;
     std::mutex genomeEvalFinishedMutex;
+    std::condition_variable genomeEvalFinishedCondition;
 
     void NSGA2_testproblem();
     double *xreal_NSGA2;

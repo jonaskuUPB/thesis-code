@@ -13,6 +13,7 @@
 #include "controllers/c4.h"
 #include "controllers/c5.h"
 #include "Utils.h"
+#include "nsga2.h"
 
 std::mutex Environment::cout_mutex;
 
@@ -205,6 +206,28 @@ void Environment::initExperimentReplay() {
 
 void Environment::initMultiObjectiveOptimization() {
     mode = 3;
+
+    Environment* env = new Environment();
+    env->setupExperiment(settings);
+
+    NSGA2Type nsga2Params;
+    void *inp = env;
+    void *out = NULL;
+
+    double *minReal = (double *)malloc(2*sizeof(double));
+    minReal[0] = 0;
+    minReal[1] = 0;
+    double *maxReal = (double *)malloc(2*sizeof(double));
+    maxReal[0] = 5;
+    maxReal[1] = 3;
+
+    int *numBits = (int *)malloc(1*sizeof(int));
+    double *minBin = (double *)malloc(1*sizeof(double));
+    double *maxBin = (double *)malloc(1*sizeof(double));
+
+    nsga2Params = SetParameters(0.5, 100, 150, 2, 2, 2, minReal, maxReal, 0.9, 0.5, 10, 20, 0, numBits, minBin, maxBin, 0, 0, 1, 1, 2, 0, 0, 0, 0);
+    InitNSGA2(&nsga2Params, inp, out, env->setNSGA2Genome);
+    NSGA2(&nsga2Params, inp, out, env->setNSGA2Genome);
 }
 
 void Environment::setSettings(std::map<std::string, std::string> settings){
@@ -725,10 +748,12 @@ void Environment::NSGA2_testproblem() {
     obj_NSGA2[1] = pow((xreal_NSGA2[0]-5.0),2.0) + pow((xreal_NSGA2[1]-5.0),2.0);
     constr_NSGA2[0] = 1.0 - (pow((xreal_NSGA2[0]-5.0),2.0) + xreal_NSGA2[1]*xreal_NSGA2[1])/25.0;
     constr_NSGA2[1] = (pow((xreal_NSGA2[0]-8.0),2.0) + pow((xreal_NSGA2[1]+3.0),2.0))/7.7 - 1.0;
+    genomeEvaluationFinished = true;
+    std::cout << xreal_NSGA2[0] << " " << xreal_NSGA2[1] << std::endl;
 }
 
 void Environment::internal_setNSGA2Genome(double *xreal, double *xbin, int **gene, double *obj, double *constr, void *inp, void *out) {
-    std::unique_lock<std::mutex> lock(genomeSetMutex);
+    std::unique_lock<std::mutex> set_lock(genomeSetMutex);
     xreal_NSGA2 = xreal;
     xbin_NSGA2 = xbin;
     gene_NSGA2 = gene;
@@ -736,14 +761,21 @@ void Environment::internal_setNSGA2Genome(double *xreal, double *xbin, int **gen
     constr_NSGA2 = constr;
     genomeSetCondition.notify_one();
     genomeIsSet = true;
+    set_lock.unlock();
+
 
     NSGA2_testproblem();
-    lock.unlock();
+
+    std::unique_lock<std::mutex> read_lock(genomeEvalFinishedMutex);
+    while(!genomeEvaluationFinished) {
+        genomeEvalFinishedCondition.wait(read_lock);
+    }
+    read_lock.unlock();
     return;
 }
 
 void Environment::setNSGA2Genome(double *xreal, double *xbin, int **gene, double *obj, double *constr, void* inp, void* out) {
-    std::cout << "Settting NSGA" << std::endl;
+    //std::cout << "Settting NSGA" << std::endl;
     Environment *env = static_cast<Environment*>(inp);
     env->internal_setNSGA2Genome(xreal, xbin, gene, obj, constr, inp, out);
 }
