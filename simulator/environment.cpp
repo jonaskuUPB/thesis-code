@@ -207,11 +207,11 @@ void Environment::initExperimentReplay() {
 void Environment::initMultiObjectiveOptimization() {
     mode = 3;
 
-    Environment* env = new Environment();
-    env->setupExperiment(settings);
+    //Environment* env = new Environment();
+    //env->setupExperiment(settings);
 
     NSGA2Type nsga2Params;
-    void *inp = env;
+    void *inp = this;
     void *out = NULL;
 
     double *minReal = (double *)malloc(2*sizeof(double));
@@ -226,8 +226,9 @@ void Environment::initMultiObjectiveOptimization() {
     double *maxBin = (double *)malloc(1*sizeof(double));
 
     nsga2Params = SetParameters(0.5, 100, 150, 2, 2, 2, minReal, maxReal, 0.9, 0.5, 10, 20, 0, numBits, minBin, maxBin, 0, 0, 1, 1, 2, 0, 0, 0, 0);
-    InitNSGA2(&nsga2Params, inp, out, env->setNSGA2Genome);
-    NSGA2(&nsga2Params, inp, out, env->setNSGA2Genome);
+    InitNSGA2(&nsga2Params, inp, out, Environment::setNSGA2Genome);
+    NSGA2(&nsga2Params, inp, out, Environment::setNSGA2Genome);
+    exit(0);
 }
 
 void Environment::setSettings(std::map<std::string, std::string> settings){

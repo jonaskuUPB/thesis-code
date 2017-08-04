@@ -14,7 +14,7 @@
 #include "nsga2.h"
 
 bool gui = true;
-bool nsga = true;
+bool nsga = false;
 std::map<std::string, std::string> default_settings;
 
 int guiRun(int argc, char** argv){
@@ -44,7 +44,7 @@ int main(int argc, char** argv)
         Environment* env = new Environment();
         env->setupExperiment(default_settings);
 
-        NSGA2Type nsga2Params;
+        /*NSGA2Type nsga2Params;
         void *inp = env;
         void *out = NULL;
 
@@ -61,7 +61,8 @@ int main(int argc, char** argv)
 
         nsga2Params = SetParameters(0.5, 100, 150, 2, 2, 2, minReal, maxReal, 0.9, 0.5, 10, 20, 0, numBits, minBin, maxBin, 0, 0, 1, 1, 2, 0, 0, 0, 0);
         InitNSGA2(&nsga2Params, inp, out, env->setNSGA2Genome);
-        NSGA2(&nsga2Params, inp, out, env->setNSGA2Genome);
+        NSGA2(&nsga2Params, inp, out, env->setNSGA2Genome);*/
+        env->initMultiObjectiveOptimization();
         exit(0);
     }
     if(gui){
