@@ -34,6 +34,8 @@ int guiRun(int argc, char** argv){
 
 int main(int argc, char** argv)
 {
+    QLocale::setDefault(QLocale::c());
+    setlocale(LC_NUMERIC,"C");
 
     // read default settings from file
     default_settings = Utils::readSettingsFrom("results/default_settings");
@@ -43,25 +45,6 @@ int main(int argc, char** argv)
     if(nsga){// create environment with default settings
         Environment* env = new Environment();
         env->setupExperiment(default_settings);
-
-        /*NSGA2Type nsga2Params;
-        void *inp = env;
-        void *out = NULL;
-
-        double *minReal = (double *)malloc(2*sizeof(double));
-        minReal[0] = 0;
-        minReal[1] = 0;
-        double *maxReal = (double *)malloc(2*sizeof(double));
-        maxReal[0] = 5;
-        maxReal[1] = 3;
-
-        int *numBits = (int *)malloc(1*sizeof(int));
-        double *minBin = (double *)malloc(1*sizeof(double));
-        double *maxBin = (double *)malloc(1*sizeof(double));
-
-        nsga2Params = SetParameters(0.5, 100, 150, 2, 2, 2, minReal, maxReal, 0.9, 0.5, 10, 20, 0, numBits, minBin, maxBin, 0, 0, 1, 1, 2, 0, 0, 0, 0);
-        InitNSGA2(&nsga2Params, inp, out, env->setNSGA2Genome);
-        NSGA2(&nsga2Params, inp, out, env->setNSGA2Genome);*/
         env->initMultiObjectiveOptimization();
         exit(0);
     }

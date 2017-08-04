@@ -7,8 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    QLocale::setDefault(QLocale::c());
-    setlocale(LC_NUMERIC,"C");
+
     ui->setupUi(this);
 
     timer = new QTimer(this);
