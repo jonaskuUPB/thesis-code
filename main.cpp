@@ -34,9 +34,6 @@ int guiRun(int argc, char** argv){
 
 int main(int argc, char** argv)
 {
-    QLocale::setDefault(QLocale::c());
-    setlocale(LC_NUMERIC,"C");
-
     // read default settings from file
     default_settings = Utils::readSettingsFrom("results/default_settings");
     srand(time(NULL));
