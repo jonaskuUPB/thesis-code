@@ -265,37 +265,31 @@ void Environment::updateEnvironment() {
             if(generation_counter < setting_n_generations){ // generation
                 if(genome_counter < setting_n_genomes){ // genome
                     if(steps < setting_steps_per_genome){ // steps
-                        if(mode == 3){
-                            std::unique_lock<std::mutex> read_lock(genomeSetMutex);
-                            while(!genomeIsSet) {
-                                genomeSetCondition.wait(read_lock);
-                            }
-                            read_lock.unlock();
-                            NSGA2_testproblem();
-                            std::unique_lock<std::mutex> set_lock(genomeEvalFinishedMutex);
-                            genomeEvaluationFinished = true;
-                            genomeEvalFinishedCondition.notify_one();
-                            set_lock.unlock();
-
-                        } else {
-                            _world->Step(1.0f / 60.0f, 32, 16);
-                            if(!genome_set){
-                                for(auto const& a : agents){
-                                    a->genome = next_genome;
+                        _world->Step(1.0f / 60.0f, 32, 16);
+                        if(!genome_set){
+                            if (mode == 3) {
+                                std::unique_lock<std::mutex> read_lock(genomeSetMutex);
+                                while(!genomeIsSet) {
+                                    return; //non-blocking wait
+                                    // genomeSetCondition.wait(read_lock); //blocking wait
                                 }
-                                genome_set = true;
+                                read_lock.unlock();
                             }
                             for(auto const& a : agents){
-                                a->update();
-                                current_fitness += a->getFitness();
+                                a->genome = next_genome;
                             }
-                            if(mode>0){
-                                steps++;
-                                temp_actions_per_gen.push_back(getAverageAction());
-                                temp_speeds_per_gen.push_back(getAverageSpeed());
-                                temp_rotations_per_gen.push_back(getAverageDeltaAngle());
-                                temp_k_distance_per_gen.push_back(getAverageKDistance());
-                            }
+                            genome_set = true;
+                        }
+                        for(auto const& a : agents){
+                            a->update();
+                            current_fitness += a->getFitness();
+                        }
+                        if(mode>0){
+                            steps++;
+                            temp_actions_per_gen.push_back(getAverageAction());
+                            temp_speeds_per_gen.push_back(getAverageSpeed());
+                            temp_rotations_per_gen.push_back(getAverageDeltaAngle());
+                            temp_k_distance_per_gen.push_back(getAverageKDistance());
                         }
                     }else{ // steps/genome finished
                         finished_genome();
@@ -358,6 +352,15 @@ void Environment::finished_genome() {
     }
     for(auto const& a : agents){
         a->reset_to_initial_position();
+    }
+    if(mode == 3) {
+        NSGA2_testproblem();
+        next_genome = population_genomes[0]; //TODO: FIXME: Set nothing as next genome and wait for input from NSGA2
+        genome_counter = 0; //TODO: Remove this
+        std::unique_lock<std::mutex> set_lock(genomeEvalFinishedMutex);
+        genomeEvaluationFinished = true;
+        genomeEvalFinishedCondition.notify_one();
+        set_lock.unlock();
     }
     emit genomeFinished();
 }
