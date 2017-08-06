@@ -29,7 +29,7 @@ void ThreadClass::StartReplayProcess(){
 }
 
 void ThreadClass::StartNSGA2Process(NSGA2Type nsga2Params, void *inp, void *out) {
-    t = std::thread(&ThreadClass::ThreadNSGA2Main,this, nsga2Params, inp, out)
+    t = std::thread(&ThreadClass::ThreadNSGA2Main,this, nsga2Params, inp, out);
 }
 
 void ThreadClass::ThreadNSGA2Main(NSGA2Type nsga2Params, void *inp, void *out) {

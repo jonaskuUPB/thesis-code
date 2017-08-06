@@ -207,6 +207,9 @@ void Environment::initExperimentReplay() {
 void Environment::initMultiObjectiveOptimization() {
     mode = 3;
 
+    genomeIsSet = false;
+    genomeEvaluationFinished = false;
+
     NSGA2Type nsga2Params;
     void *inp = this;
     void *out = NULL;
@@ -755,6 +758,7 @@ int Environment::rouletteWheelSelection(std::vector<float> fitnesses){
 }
 
 void Environment::NSGA2_testproblem() {
+    //std::cout << "Test" << std::endl;
     obj_NSGA2[0] = 4.0*(xreal_NSGA2[0]*xreal_NSGA2[0] + xreal_NSGA2[1]*xreal_NSGA2[1]);
     obj_NSGA2[1] = pow((xreal_NSGA2[0]-5.0),2.0) + pow((xreal_NSGA2[1]-5.0),2.0);
     constr_NSGA2[0] = 1.0 - (pow((xreal_NSGA2[0]-5.0),2.0) + xreal_NSGA2[1]*xreal_NSGA2[1])/25.0;
@@ -763,7 +767,7 @@ void Environment::NSGA2_testproblem() {
 }
 
 void Environment::internal_setNSGA2Genome(double *xreal, double *xbin, int **gene, double *obj, double *constr, void *inp, void *out) {
-    std::cout << "Setting" << std::endl;
+    //std::cout << "Setting internally" << std::endl;
     std::unique_lock<std::mutex> set_lock(genomeSetMutex);
     xreal_NSGA2 = xreal;
     xbin_NSGA2 = xbin;
@@ -771,11 +775,12 @@ void Environment::internal_setNSGA2Genome(double *xreal, double *xbin, int **gen
     obj_NSGA2 = obj;
     constr_NSGA2 = constr;
     genomeIsSet = true;
+    genomeEvaluationFinished = false;
     genomeSetCondition.notify_one();
     set_lock.unlock();
 
 
-    NSGA2_testproblem();
+    //NSGA2_testproblem();
 
     std::unique_lock<std::mutex> read_lock(genomeEvalFinishedMutex);
     while(!genomeEvaluationFinished) {
