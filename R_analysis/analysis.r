@@ -57,11 +57,13 @@ run_analysis <- function(expTime = "2017_06_07-21_54_17", statsName = "action_ge
 }
 
 full_analysis <- function() {
-  exp <- c("2017_06_01-10_47_18", "2017_06_07-21_54_17", "2017_06_24-10_08_21", "2017_06_28-08_41_49")
-  runs <- c(0,0,0,1)
+  exp <- c("2017_06_01-10_47_18", "2017_06_07-21_54_17", "2017_06_24-10_08_21", "2017_06_28-08_41_49", "2017_07_11-10_07_33", "2017_07_12-10_33_27")
+  runs <- c(0,0,0,0,0,0)
   for(i in 1:length(exp)){
     for(j in 0:runs[i]) {
       run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"))
+      run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "speed_gen")
+      if(i>=4) run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "k_distance_gen")
     }
   }
 }
