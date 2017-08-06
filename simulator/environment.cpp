@@ -207,9 +207,6 @@ void Environment::initExperimentReplay() {
 void Environment::initMultiObjectiveOptimization() {
     mode = 3;
 
-    //Environment* env = new Environment();
-    //env->setupExperiment(settings);
-
     NSGA2Type nsga2Params;
     void *inp = this;
     void *out = NULL;
@@ -226,9 +223,8 @@ void Environment::initMultiObjectiveOptimization() {
     double *maxBin = (double *)malloc(1*sizeof(double));
 
     nsga2Params = SetParameters(0.5, 100, 150, 2, 2, 2, minReal, maxReal, 0.9, 0.5, 10, 20, 0, numBits, minBin, maxBin, 0, 0, 1, 1, 2, 0, 0, 0, 0);
-    InitNSGA2(&nsga2Params, inp, out, Environment::setNSGA2Genome);
-    NSGA2(&nsga2Params, inp, out, Environment::setNSGA2Genome);
-    exit(0);
+    ThreadClass* t = new ThreadClass();
+    t->StartNSGA2Process(nsga2Params, inp, out);
 }
 
 void Environment::setSettings(std::map<std::string, std::string> settings){
@@ -266,23 +262,37 @@ void Environment::updateEnvironment() {
             if(generation_counter < setting_n_generations){ // generation
                 if(genome_counter < setting_n_genomes){ // genome
                     if(steps < setting_steps_per_genome){ // steps
-                        _world->Step(1.0f / 60.0f, 32, 16);
-                        if(!genome_set){
-                            for(auto const& a : agents){
-                                a->genome = next_genome;
+                        if(mode == 3){
+                            std::unique_lock<std::mutex> read_lock(genomeSetMutex);
+                            while(!genomeIsSet) {
+                                genomeSetCondition.wait(read_lock);
                             }
-                            genome_set = true;
-                        }
-                        for(auto const& a : agents){
-                            a->update();
-                            current_fitness += a->getFitness();
-                        }
-                        if(mode>0){
-                            steps++;
-                            temp_actions_per_gen.push_back(getAverageAction());
-                            temp_speeds_per_gen.push_back(getAverageSpeed());
-                            temp_rotations_per_gen.push_back(getAverageDeltaAngle());
-                            temp_k_distance_per_gen.push_back(getAverageKDistance());
+                            read_lock.unlock();
+                            NSGA2_testproblem();
+                            std::unique_lock<std::mutex> set_lock(genomeEvalFinishedMutex);
+                            genomeEvaluationFinished = true;
+                            genomeEvalFinishedCondition.notify_one();
+                            set_lock.unlock();
+
+                        } else {
+                            _world->Step(1.0f / 60.0f, 32, 16);
+                            if(!genome_set){
+                                for(auto const& a : agents){
+                                    a->genome = next_genome;
+                                }
+                                genome_set = true;
+                            }
+                            for(auto const& a : agents){
+                                a->update();
+                                current_fitness += a->getFitness();
+                            }
+                            if(mode>0){
+                                steps++;
+                                temp_actions_per_gen.push_back(getAverageAction());
+                                temp_speeds_per_gen.push_back(getAverageSpeed());
+                                temp_rotations_per_gen.push_back(getAverageDeltaAngle());
+                                temp_k_distance_per_gen.push_back(getAverageKDistance());
+                            }
                         }
                     }else{ // steps/genome finished
                         finished_genome();
@@ -749,19 +759,19 @@ void Environment::NSGA2_testproblem() {
     obj_NSGA2[1] = pow((xreal_NSGA2[0]-5.0),2.0) + pow((xreal_NSGA2[1]-5.0),2.0);
     constr_NSGA2[0] = 1.0 - (pow((xreal_NSGA2[0]-5.0),2.0) + xreal_NSGA2[1]*xreal_NSGA2[1])/25.0;
     constr_NSGA2[1] = (pow((xreal_NSGA2[0]-8.0),2.0) + pow((xreal_NSGA2[1]+3.0),2.0))/7.7 - 1.0;
-    genomeEvaluationFinished = true;
-    std::cout << xreal_NSGA2[0] << " " << xreal_NSGA2[1] << std::endl;
+    //genomeEvaluationFinished = true;
 }
 
 void Environment::internal_setNSGA2Genome(double *xreal, double *xbin, int **gene, double *obj, double *constr, void *inp, void *out) {
+    std::cout << "Setting" << std::endl;
     std::unique_lock<std::mutex> set_lock(genomeSetMutex);
     xreal_NSGA2 = xreal;
     xbin_NSGA2 = xbin;
     gene_NSGA2 = gene;
     obj_NSGA2 = obj;
     constr_NSGA2 = constr;
-    genomeSetCondition.notify_one();
     genomeIsSet = true;
+    genomeSetCondition.notify_one();
     set_lock.unlock();
 
 
