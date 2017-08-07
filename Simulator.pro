@@ -62,16 +62,16 @@ FORMS += \
     gui/mainwindow.ui
 
 unix:!macx: LIBS += -L$$PWD/Box2D/Build/Box2D/ -lBox2D
-unix:!macx: LIBS += -L$$PWD/NSGA2/Build/ -lNSGA2
+unix:!macx: LIBS += -L$$PWD/NSGA2/build/ -lNSGA2
 
 INCLUDEPATH += $$PWD/Box2D/Build/Box2D
 DEPENDPATH += $$PWD/Box2D/Build/Box2D
 
-INCLUDEPATH += $$PWD/NSGA2/Build/
-DEPENDPATH += $$PWD/NSGA2/Build/
+INCLUDEPATH += $$PWD/NSGA2/build/
+DEPENDPATH += $$PWD/NSGA2/build/
 
 # INCLUDEPATH += $$PWD/FANN
 # DEPENDPATH += $$PWD/FANN
 
 unix:!macx: PRE_TARGETDEPS += $$PWD/Box2D/Build/Box2D/libBox2D.a
-unix:!macx: PRE_TARGETDEPS += $$PWD/NSGA2/Build/libNSGA2.a
+unix:!macx: PRE_TARGETDEPS += $$PWD/NSGA2/build/libNSGA2.a

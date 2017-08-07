@@ -33,7 +33,9 @@ void ThreadClass::StartNSGA2Process(NSGA2Type nsga2Params, void *inp, void *out)
 }
 
 void ThreadClass::ThreadNSGA2Main(NSGA2Type nsga2Params, void *inp, void *out) {
-    InitNSGA2(&nsga2Params, inp, out, Environment::setNSGA2Genome);
+    Environment *env = static_cast<Environment*>(inp);
+    const char* dir = env->run_folder.c_str();
+    InitNSGA2(&nsga2Params, inp, out, Environment::setNSGA2Genome, dir);
     NSGA2(&nsga2Params, inp, out, Environment::setNSGA2Genome);
 }
 
