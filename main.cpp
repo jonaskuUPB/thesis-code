@@ -13,8 +13,8 @@
 #include <sys/types.h>
 #include "nsga2.h"
 
-bool gui = true;
-bool nsga = false;
+bool gui = false;
+bool nsga = true;
 std::map<std::string, std::string> default_settings;
 
 int guiRun(int argc, char** argv){
@@ -40,25 +40,27 @@ int main(int argc, char** argv)
     default_settings["seed_int"] = std::to_string(Utils::newSeed());
 
     if(nsga){// create environment with default settings
-        Environment* env = new Environment();
-        env->setupExperiment(default_settings);
-        env->initMultiObjectiveOptimization();
-        exit(0);
-    }
-    if(gui){
-        guiRun(argc, argv);
-    }else{
         //Run an evolution
         ThreadClass* t = new ThreadClass();
-        t->SetupEnvironment("evolution", default_settings);
-        t->StartEvoProcess();
+        t->SetupEnvironment("moo", default_settings);
+        t->StartMOOProcess();
         t->Join();
-        //Run a replay
-        ThreadClass* t2 = new ThreadClass();
-        t2->SetupEnvironment("control", default_settings);
-        t2->StartReplayProcess();
-        t2->Join();
-        //finally turn of the computer
-        //system("shutdown -P now");
+    } else {
+        if(gui){
+            guiRun(argc, argv);
+        }else{
+            //Run an evolution
+            ThreadClass* t = new ThreadClass();
+            t->SetupEnvironment("evolution", default_settings);
+            t->StartEvoProcess();
+            t->Join();
+            //Run a replay
+            ThreadClass* t2 = new ThreadClass();
+            t2->SetupEnvironment("control", default_settings);
+            t2->StartReplayProcess();
+            t2->Join();
+            //finally turn of the computer
+            //system("shutdown -P now");
+        }
     }
 }

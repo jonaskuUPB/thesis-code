@@ -12,6 +12,7 @@ public:
     void SetupEnvironment(std::string expName, std::map<std::string, std::string> s);
     void StartEvoProcess();
     void StartReplayProcess();
+    void StartMOOProcess();
     void StartNSGA2Process(NSGA2Type nsga2Params, void *inp, void *out);
     void Join();
     bool IsJoinable();
