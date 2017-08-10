@@ -44,26 +44,51 @@ cvm_test <- function(evolutionSet, controlSet) {
   return(p)
 }
 
-run_analysis <- function(expTime = "2017_06_07-21_54_17", statsName = "action_gen", testFunc = ks_test, maxGen = 100, run = "run_0") {
+run_analysis <- function(expTime = "2017_06_07-21_54_17", statsName = "action_gen", maxGen = 100, run = "run_0") {
   init()
-  vec <- vector(,maxGen)
-  for(genCount in 1:maxGen-1){
+  ks_vec <- vector(,maxGen)
+  cvm_vec <- vector(,maxGen)
+  for(genCount in 0:(maxGen-1)){
     print(genCount)
     evolution <- loadDataFromFile(fileName = buildFileName(expName = paste("evolution", expTime, sep = "-"), runId = run,  genNumber = genCount, statsName = statsName), agglomeration = mean)
     random <- loadDataFromFile(fileName = buildFileName(expName = paste("control", expTime, sep = "-"), runId = run,  genNumber = genCount, statsName = statsName), agglomeration = mean)
-    vec[genCount] <- testFunc(evolution, random)
+    ks_vec[genCount] <- ks_test(evolution, random)
+    cvm_vec[genCount] <- cvm_test(evolution, random)
   }
-  plot(vec, main = paste(statsName, expTime, run), sub=deparse(substitute(testFunc)), xlab = "generation", ylab = "p value")
+  plot(ks_vec, main = paste(statsName, expTime, run), sub="ks-test", xlab = "generation", ylab = "p value", ylim=c(0,1))
+  plot(cvm_vec, main = paste(statsName, expTime, run), sub="cvm-test", xlab = "generation", ylab = "p value", ylim=c(0,1))
+  result <- matrix(ncol=2, nrow=maxGen)
+  result[,1] = ks_vec
+  result[,2] = cvm_vec
+  return(result)
 }
 
 full_analysis <- function() {
   exp <- c("2017_06_01-10_47_18", "2017_06_07-21_54_17", "2017_06_24-10_08_21", "2017_06_28-08_41_49", "2017_07_11-10_07_33", "2017_07_12-10_33_27")
   runs <- c(0,0,0,0,0,0)
+  action_matrix_ks <- matrix(ncol = length(exp), nrow = 100)
+  speed_matrix_ks <- matrix(ncol = length(exp), nrow = 100)
+  k_distance_matrix_ks <- matrix(ncol = length(exp), nrow = 100)
+  action_matrix_cvm <- matrix(ncol = length(exp), nrow = 100)
+  speed_matrix_cvm <- matrix(ncol = length(exp), nrow = 100)
+  k_distance_matrix_cvm <- matrix(ncol = length(exp), nrow = 100)
   for(i in 1:length(exp)){
     for(j in 0:runs[i]) {
-      run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"))
-      run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "speed_gen")
-      if(i>=4) run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "k_distance_gen")
+      action_matrix_ks[,i] <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"))[,1]
+      action_matrix_cvm[,i] <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"))[,2]
+      speed_matrix_ks[,i] <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "speed_gen")[,1]
+      speed_matrix_cvm[,i] <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "speed_gen")[,2]
+      if(i>=4) {
+        k_distance_matrix_ks[,i] <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "k_distance_gen")[,1]
+        k_distance_matrix_cvm[,i] <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "k_distance_gen")[,2]
+      }
     }
   }
+  matplot(action_matrix_ks, type = "b", pch=1, col=1:length(exp), main = "action values", sub="ks-test", xlab = "generation", ylab = "p value", ylim=c(0,1))
+  matplot(speed_matrix_ks, type = "b", pch=1, col=1:length(exp), main = "speed values", sub="ks-test", xlab = "generation", ylab = "p value", ylim=c(0,1))
+  matplot(k_distance_matrix_ks, type = "b", pch=1, col=1:length(exp), main = "k distance values", sub="ks-test", xlab = "generation", ylab = "p value", ylim=c(0,1))
+  
+  matplot(action_matrix_cvm, type = "b", pch=1, col=1:length(exp), main = "action values", sub="cvm-test", xlab = "generation", ylab = "p value", ylim=c(0,1))
+  matplot(speed_matrix_cvm, type = "b", pch=1, col=1:length(exp), main = "speed values", sub="cvm-test", xlab = "generation", ylab = "p value", ylim=c(0,1))
+  matplot(k_distance_matrix_cvm, type = "b", pch=1, col=1:length(exp), main = "k distance values", sub="cvm-test", xlab = "generation", ylab = "p value", ylim=c(0,1))
 }
