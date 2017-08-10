@@ -13,8 +13,8 @@
 #include <sys/types.h>
 #include "nsga2.h"
 
-bool gui = false;
-bool nsga = true;
+bool gui = true;
+bool nsga = false;
 std::map<std::string, std::string> default_settings;
 
 int guiRun(int argc, char** argv){

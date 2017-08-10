@@ -107,7 +107,6 @@ void Environment::setupExperiment(std::map<std::string, std::string> s){
     int number_of_genes = 0;
     // setup controller based on settings
     for (int i = 0; i < std::stoi(settings["n_agents_int"]); i++) {
-        IController* controller;
         if(settings["ann_type"] == "1"){
             controller = new C1();
         }
@@ -210,22 +209,29 @@ void Environment::initMultiObjectiveOptimization() {
     genomeIsSet = false;
     genomeEvaluationFinished = false;
 
+    //TODO: Calculate seed
+    double seed = 0.5;
+    int popSize = std::stoi(settings["n_genomes_int"]);
+    int numGenerations = std::stoi(settings["n_generations_int"]);
+    int numGenes = controller->getNumberOfGenes();
+    float mutRate = std::stof(settings["mutation_rate_float"]);
+
     NSGA2Type nsga2Params;
     void *inp = this;
     void *out = NULL;
 
-    double *minReal = (double *)malloc(2*sizeof(double));
-    minReal[0] = 0;
-    minReal[1] = 0;
-    double *maxReal = (double *)malloc(2*sizeof(double));
-    maxReal[0] = 5;
-    maxReal[1] = 3;
+    double *minReal = (double *)malloc(numGenes*sizeof(double));
+    double *maxReal = (double *)malloc(numGenes*sizeof(double));
+    for (int i = 0; i < numGenes; i++){
+        minReal[i] = -0.5;
+        maxReal[i] = 0.5;
+    }
 
     int *numBits = (int *)malloc(1*sizeof(int));
     double *minBin = (double *)malloc(1*sizeof(double));
     double *maxBin = (double *)malloc(1*sizeof(double));
 
-    nsga2Params = SetParameters(0.5, 100, 150, 2, 2, 2, minReal, maxReal, 0.9, 0.5, 10, 20, 0, numBits, minBin, maxBin, 0, 0, 1, 1, 2, 0, 0, 0, 0);
+    nsga2Params = SetParameters(seed, popSize, numGenerations, 2, 0, numGenes, minReal, maxReal, 0.9, mutRate, 20, 20, 0, numBits, minBin, maxBin, 0, 0, 1, 1, 2, 0, 0, 0, 0);
     ThreadClass* t = new ThreadClass();
     t->StartNSGA2Process(nsga2Params, inp, out);
 }
@@ -354,9 +360,9 @@ void Environment::finished_genome() {
         a->reset_to_initial_position();
     }
     if(mode == 3) {
-        NSGA2_testproblem();
+        setNSGA2Objectives();
         next_genome = population_genomes[0]; //TODO: FIXME: Set nothing as next genome and wait for input from NSGA2
-        genome_counter = 0; //TODO: Remove this
+        //genome_counter = 0; //TODO: Remove this
         std::unique_lock<std::mutex> set_lock(genomeEvalFinishedMutex);
         genomeEvaluationFinished = true;
         genomeEvalFinishedCondition.notify_one();
@@ -484,7 +490,7 @@ void Environment::finished_generation() {
             for(int i = 0; i < (std::stoi(settings["n_genomes_int"])-std::stoi(settings["elitism_int"])); i++){
                 temp_genomes.push_back(mutateP(population_genomes[rouletteWheelSelection(genome_fitnesses)],mutation_rate));
             }
-        } else {
+        } else if (mode == 2){
             QString path = QString();
             path.append(QString::fromStdString(genome_folder));
             path.append(QString::fromStdString("gen_"));
@@ -760,6 +766,11 @@ int Environment::rouletteWheelSelection(std::vector<float> fitnesses){
     return temp_fitnesses.size() - 1;
 }
 
+void Environment::setNSGA2Objectives() {
+    obj_NSGA2[0] = genome_fitnesses.back();
+    obj_NSGA2[1] = 1 / data_k_distance.back().back();
+}
+
 void Environment::NSGA2_testproblem() {
     //std::cout << "Test" << std::endl;
     obj_NSGA2[0] = 4.0*(xreal_NSGA2[0]*xreal_NSGA2[0] + xreal_NSGA2[1]*xreal_NSGA2[1]);
@@ -772,6 +783,9 @@ void Environment::NSGA2_testproblem() {
 void Environment::internal_setNSGA2Genome(double *xreal, double *xbin, int **gene, double *obj, double *constr, void *inp, void *out) {
     //std::cout << "Setting internally" << std::endl;
     std::unique_lock<std::mutex> set_lock(genomeSetMutex);
+    for(int i = 0; i< controller->getNumberOfGenes(); i++){
+        next_genome[i] = xreal[i];
+    }
     xreal_NSGA2 = xreal;
     xbin_NSGA2 = xbin;
     gene_NSGA2 = gene;

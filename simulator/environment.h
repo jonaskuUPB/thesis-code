@@ -170,6 +170,7 @@ private:
     void finished_run();
     void finished_experiment();
 
+    IController* controller;
     std::vector<float> next_genome;
 
     void save_genome_stats();
@@ -185,6 +186,7 @@ private:
     std::mutex genomeEvalFinishedMutex;
     std::condition_variable genomeEvalFinishedCondition;
 
+    void setNSGA2Objectives();
     void NSGA2_testproblem();
     double *xreal_NSGA2;
     double *xbin_NSGA2;
