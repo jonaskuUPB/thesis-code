@@ -297,6 +297,7 @@ void Environment::updateEnvironment() {
                             temp_rotations_per_gen.push_back(getAverageDeltaAngle());
                             temp_k_distance_per_gen.push_back(getAverageKDistance());
                         }
+                        emit stepFinished(steps);
                     }else{ // steps/genome finished
                         finished_genome();
                     }
@@ -361,8 +362,7 @@ void Environment::finished_genome() {
     }
     if(mode == 3) {
         setNSGA2Objectives();
-        next_genome = population_genomes[0]; //TODO: FIXME: Set nothing as next genome and wait for input from NSGA2
-        //genome_counter = 0; //TODO: Remove this
+        next_genome.clear();
         std::unique_lock<std::mutex> set_lock(genomeEvalFinishedMutex);
         genomeEvaluationFinished = true;
         genomeEvalFinishedCondition.notify_one();
@@ -811,4 +811,12 @@ void Environment::setNSGA2Genome(double *xreal, double *xbin, int **gene, double
     //std::cout << "Settting NSGA" << std::endl;
     Environment *env = static_cast<Environment*>(inp);
     env->internal_setNSGA2Genome(xreal, xbin, gene, obj, constr, inp, out);
+}
+
+float Environment::getLastActionValue() {
+    return temp_actions_per_gen.back();
+}
+
+float Environment::getLastKDistance() {
+    return temp_k_distance_per_gen.back();
 }

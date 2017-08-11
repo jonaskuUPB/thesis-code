@@ -19,7 +19,7 @@
 #define WIDTH   1280
 #define HEIGHT  720
 
-class Environment : QObject
+class Environment : public QObject
 {
     Q_OBJECT
 
@@ -70,6 +70,9 @@ public:
     //updateMethod
     void updateEnvironment();
 
+    //get current stats
+    float getLastActionValue();
+    float getLastKDistance();
 
     void saveCoveredDistance();
 
@@ -86,6 +89,7 @@ public:
     static void setNSGA2Genome(double *xreal, double *xbin, int **gene, double *obj, double *constr, void* inp, void* out);
 
 signals:
+    void stepFinished(unsigned long int s);
     void genomeFinished();
     void generationFinished();
     void runFinished();

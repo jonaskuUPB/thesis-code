@@ -48,6 +48,7 @@ void MainWindow::toggle_simulation() {
 void MainWindow::setEnvironment(Environment* env){
     ui->environmentWidget->setEnvironment(env);
     displaySettings(ui->environmentWidget->getEnvironment()->getSettings());
+    connect(env, SIGNAL(stepFinished(unsigned long int)), this, SLOT(stepsChanged(unsigned long int)));
 }
 
 void MainWindow::newSeed(){
@@ -62,7 +63,10 @@ void MainWindow::resetEnvironment(){
 }
 
 void MainWindow::stepsChanged(unsigned long int s){
-//    ui->label_Generation->setText(QString("step: ").append(QString::number(s)));
+    ui->label_StepDisplay->setText(QString("Steps: ").append(QString::number(s)));
+    //TODO: Other two stats
+    ui->label_ActionValueDisplay->setText(QString("Action Value: ").append(QString::number(ui->environmentWidget->getEnvironment()->getLastActionValue())));
+    ui->label_KDistanceDisplay->setText(QString("K Distance: ").append(QString::number(ui->environmentWidget->getEnvironment()->getLastKDistance())));
 }
 
 void MainWindow::avgFitnessChanged(float f){
