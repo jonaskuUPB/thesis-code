@@ -132,17 +132,7 @@ void Environment::setupExperiment(std::map<std::string, std::string> s){
 
     population_genomes.clear();
     if(settings["type_evo_int"] == "1"){ // homogen
-
-        std::uniform_real_distribution<float> uniform_rand_float(-0.5,0.5);
-        for(int i = 0; i < std::stoi(settings["n_genomes_int"]); i++){
-
-            std::vector<float>temp_genome;
-            for(int j = 0; j < number_of_genes; j++){
-                float f = uniform_rand_float(mt);
-                temp_genome.push_back(f);
-            }
-            population_genomes.push_back(temp_genome);
-        }
+        generateRandomPopulation();
     }
     population_genomes_backup = population_genomes;
     run_counter = 0;
@@ -171,13 +161,24 @@ void Environment::setupExperiment(std::map<std::string, std::string> s){
     environment_initialized = true;
 }
 
+void Environment::generateRandomPopulation() {
+    int number_of_genes = controller->getNumberOfGenes();
+    std::uniform_real_distribution<float> uniform_rand_float(-0.5,0.5);
+    for(int i = 0; i < std::stoi(settings["n_genomes_int"]); i++){
+        std::vector<float>temp_genome;
+        for(int j = 0; j < number_of_genes; j++){
+            float f = uniform_rand_float(mt);
+            temp_genome.push_back(f);
+        }
+        population_genomes.push_back(temp_genome);
+    }
+}
+
 void Environment::generateRandomANNs(){
     for(unsigned int gen = 0; gen < std::stoi(settings["n_generations_int"]); gen++){
         std::string fname = "gen_" + std::to_string(gen);
         std::ofstream file;
         file.open(genome_folder+fname);
-        std::mt19937 mt;
-        mt.seed(std::stoi("0"));
         std::uniform_real_distribution<float> uniform_rand_float(-0.5,0.5);
         for(unsigned int i = 0; i < std::stoi(settings["n_genomes_int"]); i++){
             file << 0; //dummy fitness
@@ -209,8 +210,8 @@ void Environment::initMultiObjectiveOptimization() {
     genomeIsSet = false;
     genomeEvaluationFinished = false;
 
-    //TODO: Calculate seed
-    double seed = 0.5;
+    std::uniform_real_distribution<float> uniform_rand_float(0,1);
+    double seed = uniform_rand_float(mt);
     int popSize = std::stoi(settings["n_genomes_int"]);
     int numGenerations = std::stoi(settings["n_generations_int"]);
     int numGenes = controller->getNumberOfGenes();
@@ -361,9 +362,10 @@ void Environment::finished_genome() {
         a->reset_to_initial_position();
     }
     if(mode == 3) {
+        std::unique_lock<std::mutex> set_lock(genomeEvalFinishedMutex);
         setNSGA2Objectives();
         next_genome.clear();
-        std::unique_lock<std::mutex> set_lock(genomeEvalFinishedMutex);
+        genomeIsSet = false;
         genomeEvaluationFinished = true;
         genomeEvalFinishedCondition.notify_one();
         set_lock.unlock();
@@ -538,7 +540,8 @@ void Environment::finished_run() {
     run_fitnesses.push_back(generation_fitnesses);
     generation_fitnesses.clear();
 
-    //TODO: Set initial population
+    //Set new initial population
+    generateRandomPopulation();
 
     //setup the new folder for the next run
     run_counter++;
@@ -768,7 +771,7 @@ int Environment::rouletteWheelSelection(std::vector<float> fitnesses){
 
 void Environment::setNSGA2Objectives() {
     obj_NSGA2[0] = genome_fitnesses.back();
-    obj_NSGA2[1] = 1 / data_k_distance.back().back();
+    obj_NSGA2[1] = 200 - data_k_distance.back().back();
 }
 
 void Environment::NSGA2_testproblem() {
@@ -784,7 +787,7 @@ void Environment::internal_setNSGA2Genome(double *xreal, double *xbin, int **gen
     //std::cout << "Setting internally" << std::endl;
     std::unique_lock<std::mutex> set_lock(genomeSetMutex);
     for(int i = 0; i< controller->getNumberOfGenes(); i++){
-        next_genome[i] = xreal[i];
+        next_genome.push_back(xreal[i]);
     }
     xreal_NSGA2 = xreal;
     xbin_NSGA2 = xbin;

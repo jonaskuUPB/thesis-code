@@ -128,6 +128,7 @@ protected:
     std::mt19937 mt;
 
     //maintaining population
+    void generateRandomPopulation();
     std::vector<float>mutate(std::vector<float> genome, float f);
     std::vector<float>mutateP(std::vector<float> genome, float f);
     int rouletteWheelSelection(std::vector<float> fitnesses);
