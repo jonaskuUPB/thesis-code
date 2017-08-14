@@ -1,5 +1,5 @@
 init <- function() {
-  setwd("/home/jonas/Documents/Master/thesis-code/results")
+  setwd("/home/jonas/Documents/Master/thesis")
 }
 
 normalize <- function(data) {
@@ -19,7 +19,7 @@ buildFileName <- function(expName = "2017_06_01-10_47_18", runId = "run_0", genN
 loadDataFromFile <- function(fileName, agglomeration = mean, preProcessing = NULL, genSize = 50) {
   t <- read.table(fileName)
   result <- vector(,genSize)
-  for (i in 1:genSize-1){
+  for (i in 0:(genSize-1)){
     result[i] <- agglomeration(as.numeric(t[i,]))
   }
   if(!is.null(preProcessing))
