@@ -13,8 +13,10 @@
 #include <sys/types.h>
 #include "nsga2.h"
 
-bool gui = true;
-bool nsga = false;
+bool gui = false; //if true the GUI will be shown, otherwise all unsupervised runs are started
+bool nsga = true; //starts one unsupervised run with NSGA-2
+bool evo = false; //starts one unsupervised run with Evolution
+bool randANN = false; //starts one unsupervised run with random ANNs
 std::map<std::string, std::string> default_settings;
 
 int guiRun(int argc, char** argv){
@@ -39,28 +41,32 @@ int main(int argc, char** argv)
     srand(time(NULL));
     default_settings["seed_int"] = std::to_string(Utils::newSeed());
 
-    if(nsga){// create environment with default settings
-        //Run an evolution
-        ThreadClass* t = new ThreadClass();
-        t->SetupEnvironment("moo", default_settings);
-        t->StartMOOProcess();
-        t->Join();
-    } else {
-        if(gui){
-            guiRun(argc, argv);
-        }else{
+
+    if(gui){
+        guiRun(argc, argv);
+    }else{
+        if(nsga){
+            //Run an evolution
+            ThreadClass* t = new ThreadClass();
+            t->SetupEnvironment("moo", default_settings);
+            t->StartMOOProcess();
+            t->Join();
+        }
+        if(evo){
             //Run an evolution
             ThreadClass* t = new ThreadClass();
             t->SetupEnvironment("evolution", default_settings);
             t->StartEvoProcess();
             t->Join();
+        }
+        if(randANN){
             //Run a replay
             ThreadClass* t2 = new ThreadClass();
             t2->SetupEnvironment("control", default_settings);
             t2->StartReplayProcess();
             t2->Join();
-            //finally turn of the computer
-            //system("shutdown -P now");
         }
+        //finally turn of the computer
+        //system("shutdown -P now");
     }
 }
