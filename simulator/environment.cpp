@@ -291,12 +291,13 @@ void Environment::updateEnvironment() {
                             a->update();
                             current_fitness += a->getFitness();
                         }
+                        //Remember stats
+                        temp_actions_per_gen.push_back(getAverageAction());
+                        temp_speeds_per_gen.push_back(getAverageSpeed());
+                        temp_rotations_per_gen.push_back(getAverageDeltaAngle());
+                        temp_k_distance_per_gen.push_back(getAverageKDistance());
                         if(mode>0){
                             steps++;
-                            temp_actions_per_gen.push_back(getAverageAction());
-                            temp_speeds_per_gen.push_back(getAverageSpeed());
-                            temp_rotations_per_gen.push_back(getAverageDeltaAngle());
-                            temp_k_distance_per_gen.push_back(getAverageKDistance());
                         }
                         emit stepFinished(steps);
                     }else{ // steps/genome finished
@@ -609,6 +610,7 @@ void Environment::setGenomeForAllAgents(std::vector<float> genome){
     for(auto const& a : agents){
         a->genome = genome;
     }
+    genome_set = true;
 }
 
 void Environment::savePoseAndSpeed(){
@@ -771,7 +773,7 @@ int Environment::rouletteWheelSelection(std::vector<float> fitnesses){
 
 void Environment::setNSGA2Objectives() {
     obj_NSGA2[0] = genome_fitnesses.back();
-    obj_NSGA2[1] = 200 - data_k_distance.back().back();
+    obj_NSGA2[1] = WIDTH / 2 - data_k_distance.back().back();
 }
 
 void Environment::NSGA2_testproblem() {
