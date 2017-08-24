@@ -772,8 +772,8 @@ int Environment::rouletteWheelSelection(std::vector<float> fitnesses){
 }
 
 void Environment::setNSGA2Objectives() {
-    obj_NSGA2[0] = genome_fitnesses.back();
-    obj_NSGA2[1] = WIDTH / 2 - data_k_distance.back().back();
+    obj_NSGA2[0] = -genome_fitnesses.back();
+    obj_NSGA2[1] = data_k_distance.back().back();
 }
 
 void Environment::NSGA2_testproblem() {
