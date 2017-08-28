@@ -11,7 +11,6 @@ INCLUDEPATH += NSGA2/
 INCLUDEPATH += simulator/
 LIBS += -lBox2D -lpthread -pthread
 LIBS += -lNSGA2
-# LIBS += -L/usr/local/lib/ -lfann
 
 QT       += core gui
 QT       += opengl
@@ -69,9 +68,6 @@ DEPENDPATH += $$PWD/Box2D/Build/Box2D
 
 INCLUDEPATH += $$PWD/NSGA2/build/
 DEPENDPATH += $$PWD/NSGA2/build/
-
-# INCLUDEPATH += $$PWD/FANN
-# DEPENDPATH += $$PWD/FANN
 
 unix:!macx: PRE_TARGETDEPS += $$PWD/Box2D/Build/Box2D/libBox2D.a
 unix:!macx: PRE_TARGETDEPS += $$PWD/NSGA2/build/libNSGA2.a

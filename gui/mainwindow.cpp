@@ -84,8 +84,8 @@ void MainWindow::on_treeView_doubleClicked(const QModelIndex &index)
         std::string fitness = ui->environmentWidget->readAndSetGenomeFrom(ui->sB_GenomeNumber->value(), results->filePath(index));
         ui->label_Fitness->setText("Fitness: " + QString::fromStdString(fitness));
     }
-    if(info.isFile() && info.fileName().startsWith("expId")){
-        qDebug() << "Experiment set up with settings from " <<info.fileName() << ".";
+    if(info.isFile() && info.fileName().startsWith("settings")){
+        qDebug() << "Experiment set up with settings from " << info.fileName() << ".";
         std::map<std::string, std::string> settings = ui->environmentWidget->readSettingsFrom(results->filePath(index));
         displaySettings(settings);
         readAndSetSettingsfromUi();
@@ -129,6 +129,7 @@ void MainWindow::readAndSetSettingsfromUi(){
     settings["ann_type"] = std::to_string((int)ui->sb_ann->value());;
     settings["seed_int"] = ui->lineEdit_Seed->text().toStdString();
     displaySettings(settings);
+    ui->sB_GenomeNumber->setMaximum(std::stoi(settings["n_generations_int"])-1);
     ui->environmentWidget->setEnvironmentSettings(settings);
     ui->environmentWidget->update();
 }

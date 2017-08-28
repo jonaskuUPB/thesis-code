@@ -5,7 +5,6 @@ Makefile
 
 # Ignore libraries
 Box2D/
-FANN/
 NSGA2/
 
 # Ignore editor files
@@ -15,3 +14,6 @@ Simulator.pro.user
 results/*
 # but not the default settings
 !results/default_settings
+
+#ignore the plot.out file from NSGA2
+plot.out
