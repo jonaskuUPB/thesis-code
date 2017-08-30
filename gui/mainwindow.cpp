@@ -90,6 +90,11 @@ void MainWindow::on_treeView_doubleClicked(const QModelIndex &index)
         displaySettings(settings);
         readAndSetSettingsfromUi();
     }
+    if(info.isFile() && info.fileName().endsWith("pop.out")){
+        qDebug() << "Reading genome "<< ui->sB_GenomeNumber->value() <<" from " <<info.fileName() << ".";
+        std::string fitness = ui->environmentWidget->readAndSetMOOGenomeFrom(ui->sB_GenomeNumber->value(), results->filePath(index));
+        ui->label_Fitness->setText("Fitness: " + QString::fromStdString(fitness));
+    }
 }
 
 void MainWindow::displaySettings(std::map<std::string, std::string> settings){
@@ -184,7 +189,7 @@ void MainWindow::on_ReplayExperimentButton_clicked()
     QString path = QString();
     path.append(QString::fromStdString(ui->environmentWidget->getEnvironment()->genome_folder));
     path.append(QString::fromStdString("gen_0"));
-    std::vector<std::vector<float>> temp_genomes = Utils::readAllGenomesFrom(path);
+    std::vector<std::vector<float>> temp_genomes = Utils::readAllGenomesFromEvolutionFile(path);
     ui->environmentWidget->getEnvironment()->setPopulation(temp_genomes);
     startSimulation(2);
 }

@@ -23,7 +23,7 @@ void ThreadClass::StartReplayProcess(){
     QString path = QString();
     path.append(QString::fromStdString(env->genome_folder));
     path.append(QString::fromStdString("gen_0"));
-    std::vector<std::vector<float>> temp_genomes = Utils::readAllGenomesFrom(path);
+    std::vector<std::vector<float>> temp_genomes = Utils::readAllGenomesFromEvolutionFile(path);
     env->setPopulation(temp_genomes);
     t = std::thread(&ThreadClass::ThreadEvoMain,this);
 }

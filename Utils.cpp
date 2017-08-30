@@ -66,9 +66,38 @@ namespace Utils {
         return temp;
     }
 
-
-    std::vector<float> readBestGenomeFrom(QString path){
+    /*
+     * Reads all genomes from a list of " " (space) seperated values.
+     * Specify how many entries before and after the genome are in that file (per line). They are omitted.
+     */
+    std::vector<std::vector<float>> readAllGenomesFromFile(QString path, int entriesBefore, int entriesAfter) {
         QFile f(path);
+        QStringList s;
+        std::vector<std::vector<float>> return_vector;
+        if (f.open(QFile::ReadOnly | QFile::Text)){
+            QTextStream in(&f);
+            while(!in.atEnd()){
+                QString line = in.readLine();
+                s = line.split(" ");
+                for (int i = 0; i < entriesBefore; i++){
+                    s.removeFirst();
+                }
+                for (int i = 0; i < entriesAfter; i++){
+                    s.removeLast();
+                }
+                std::vector<float> temp_vector;
+                for(auto const& f : s){
+                    temp_vector.push_back(f.toFloat());
+                }
+                return_vector.push_back(temp_vector);
+            }
+        }
+        f.close();
+        return return_vector;
+    }
+
+    std::vector<float> readBestGenomeFromEvolutionFile(QString path){
+        /*QFile f(path);
         QStringList s;
         std::vector<float> return_vector;
 
@@ -82,28 +111,12 @@ namespace Utils {
         for(auto const& f : s){
             return_vector.push_back(f.toFloat());
         }
-        return return_vector;
+        return return_vector;*/
+        return readAllGenomesFromEvolutionFile(path)[0];
     }
 
-    std::vector<std::vector<float>> readAllGenomesFrom(QString path){
-        QFile f(path);
-        QStringList s;
-        std::vector<std::vector<float>> return_vector;
-        if (f.open(QFile::ReadOnly | QFile::Text)){
-            QTextStream in(&f);
-            while(!in.atEnd()){
-                QString line = in.readLine();
-                s = line.split(" ");
-                s.removeAt(0); // remove first fitness entry
-                std::vector<float> temp_vector;
-                for(auto const& f : s){
-                    temp_vector.push_back(f.toFloat());
-                }
-                return_vector.push_back(temp_vector);
-            }
-        }
-        f.close();
-        return return_vector;
+    std::vector<std::vector<float>> readAllGenomesFromEvolutionFile(QString path){
+        return readAllGenomesFromFile(path, 1,0);
     }
 
     int newSeed() {

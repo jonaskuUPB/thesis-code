@@ -498,7 +498,7 @@ void Environment::finished_generation() {
             path.append(QString::fromStdString(genome_folder));
             path.append(QString::fromStdString("gen_"));
             path.append(QString::fromStdString(std::to_string(generation_counter)));
-            temp_genomes = Utils::readAllGenomesFrom(path);
+            temp_genomes = Utils::readAllGenomesFromEvolutionFile(path);
         }
 
         genome_fitnesses.clear();

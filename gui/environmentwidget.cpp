@@ -57,6 +57,41 @@ void EnvironmentWidget::saveTrace()
     env->saveCoveredDistance();
 }
 
+std::string EnvironmentWidget::readAndSetMOOGenomeFrom(int value, QString path){
+    QFile f(path);
+    QStringList s;
+
+    // currently only reading the first line => best fitness, since the file is sorted by decreasing fitness
+    int counter = 0;
+    if (f.open(QFile::ReadOnly | QFile::Text)){
+        QTextStream in(&f);
+        QString line = in.readLine();
+        line = in.readLine();
+        line = in.readLine();
+        while(counter < value){
+            line = in.readLine();
+            counter++;
+        }
+        s =  line.split("\t");
+    }
+    f.close();
+    std::string fitness = s[0].toStdString();  // store fitness for gui
+    s.removeAt(0);
+    s.removeFirst(); //remove second objective
+    s.removeLast(); //remove crowding distance
+    s.removeLast(); //remove rank
+    s.removeLast(); //remove constraint violation
+    std::vector<float> temp_vector;
+    for(auto const& f : s){
+        qDebug() << f;
+        temp_vector.push_back(f.toFloat());
+    }
+    emit initEnvWithSettingsFromUi();
+    env->setGenomeForAllAgents(temp_vector);
+    update();
+    return fitness;
+}
+
 std::string EnvironmentWidget::readAndSetGenomeFrom(int value, QString path){
     QFile f(path);
     QStringList s;
@@ -79,7 +114,6 @@ std::string EnvironmentWidget::readAndSetGenomeFrom(int value, QString path){
     for(auto const& f : s){
         temp_vector.push_back(f.toFloat());
     }
-
     emit initEnvWithSettingsFromUi();
     env->setGenomeForAllAgents(temp_vector);
     update();

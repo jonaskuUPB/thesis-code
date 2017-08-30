@@ -16,6 +16,7 @@ public:
     void mousePressEvent(QMouseEvent *);
 
     std::string readAndSetGenomeFrom(int value, QString path);
+    std::string readAndSetMOOGenomeFrom(int value, QString path);
     std::map<std::string, std::string> readSettingsFrom(QString path);
     void setEnvironmentSettings(std::map<std::string, std::string> s);
     void resetEnvironment();
