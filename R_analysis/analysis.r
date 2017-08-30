@@ -24,23 +24,17 @@ loadDataFromFile <- function(fileName, agglomeration = mean, preProcessing = NUL
   }
   if(!is.null(preProcessing))
     result = preProcessing(result)
-  # print(result)
   return(result)
 }
 
 ks_test <- function(evolutionSet, controlSet){
   ks_result = ks.test(evolutionSet, controlSet, exact = TRUE)
-  # print(ks_result$p.value)
   return(ks_result$p.value)
 }
 
 cvm_test <- function(evolutionSet, controlSet) {
   cvm <- cramer::cramer.test(evolutionSet, controlSet)
   p <- cvm$p.value
-  
-  #cvm <- CvM2SL2Test::cvmts.test(evolutionSet, controlSet)
-  #p <- CvM2SL2Test::cvmts.pval(cvm, 50, 50) 
-
   return(p)
 }
 
@@ -50,8 +44,8 @@ run_analysis <- function(expTime = "2017_06_07-21_54_17", statsName = "action_ge
   cvm_vec <- vector(,maxGen)
   for(genCount in 0:(maxGen-1)){
     print(genCount)
-    evolution <- loadDataFromFile(fileName = buildFileName(expName = paste("evolution", expTime, sep = "-"), runId = run,  genNumber = genCount, statsName = statsName), agglomeration = mean)
-    random <- loadDataFromFile(fileName = buildFileName(expName = paste("control", expTime, sep = "-"), runId = run,  genNumber = genCount, statsName = statsName), agglomeration = mean)
+    evolution <- loadDataFromFile(fileName = buildFileName(expName = paste("evolution", expTime, sep = "-"), runId = run,  genNumber = genCount, statsName = statsName), agglomeration = median)
+    random <- loadDataFromFile(fileName = buildFileName(expName = paste("control", expTime, sep = "-"), runId = run,  genNumber = genCount, statsName = statsName), agglomeration = median)
     ks_vec[genCount] <- ks_test(evolution, random)
     cvm_vec[genCount] <- cvm_test(evolution, random)
   }
@@ -64,7 +58,8 @@ run_analysis <- function(expTime = "2017_06_07-21_54_17", statsName = "action_ge
 }
 
 full_analysis <- function() {
-  exp <- c("2017_06_01-10_47_18", "2017_06_07-21_54_17", "2017_06_24-10_08_21", "2017_06_28-08_41_49", "2017_07_11-10_07_33", "2017_07_12-10_33_27")
+  #exp <- c("2017_06_01-10_47_18", "2017_06_07-21_54_17", "2017_06_24-10_08_21", "2017_06_28-08_41_49", "2017_07_11-10_07_33", "2017_07_12-10_33_27")
+  exp <- c("Experiment_1", "Experiment_2", "Experiment_3", "Experiment_4", "Experiment_5", "Experiment_6")
   runs <- c(0,0,0,0,0,0)
   action_matrix_ks <- matrix(ncol = length(exp), nrow = 100)
   speed_matrix_ks <- matrix(ncol = length(exp), nrow = 100)
@@ -84,11 +79,18 @@ full_analysis <- function() {
       }
     }
   }
+  par(mar = c(5,4,4,8), xpd=TRUE)
   matplot(action_matrix_ks, type = "b", pch=1, col=1:length(exp), main = "action values", sub="ks-test", xlab = "generation", ylab = "p value", ylim=c(0,1))
+  legend("right", inset=c(-0.22,0), exp, col=1:length(exp), cex=0.8,fill=1:length(exp))
   matplot(speed_matrix_ks, type = "b", pch=1, col=1:length(exp), main = "speed values", sub="ks-test", xlab = "generation", ylab = "p value", ylim=c(0,1))
+  legend("right", inset=c(-0.22,0), exp, col=1:length(exp), cex=0.8,fill=1:length(exp))
   matplot(k_distance_matrix_ks, type = "b", pch=1, col=1:length(exp), main = "k distance values", sub="ks-test", xlab = "generation", ylab = "p value", ylim=c(0,1))
+  legend("right", inset=c(-0.22,0), exp, col=1:length(exp), cex=0.8,fill=1:length(exp))
   
   matplot(action_matrix_cvm, type = "b", pch=1, col=1:length(exp), main = "action values", sub="cvm-test", xlab = "generation", ylab = "p value", ylim=c(0,1))
+  legend("right", inset=c(-0.22,0), exp, col=1:length(exp), cex=0.8,fill=1:length(exp))
   matplot(speed_matrix_cvm, type = "b", pch=1, col=1:length(exp), main = "speed values", sub="cvm-test", xlab = "generation", ylab = "p value", ylim=c(0,1))
+  legend("right", inset=c(-0.22,0), exp, col=1:length(exp), cex=0.8,fill=1:length(exp))
   matplot(k_distance_matrix_cvm, type = "b", pch=1, col=1:length(exp), main = "k distance values", sub="cvm-test", xlab = "generation", ylab = "p value", ylim=c(0,1))
+  legend("right", inset=c(-0.22,0), exp, col=1:length(exp), cex=0.8,fill=1:length(exp))
 }
