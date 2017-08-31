@@ -163,7 +163,7 @@ protected:
     std::vector<float> genome_fitnesses;
     float current_fitness = 0.0;
 
-    int mode = 1; //0=play single genome; 1=evolution; 2=replay_experiment; 3=MOO
+    int mode = 1; //0=play single genome; 1=evolution; 2=replay_experiment; 3=MO
 
     std::set<std::set<int>> cluster;
     std::map<int, float> distance;

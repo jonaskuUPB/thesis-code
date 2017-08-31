@@ -92,7 +92,7 @@ void MainWindow::on_treeView_doubleClicked(const QModelIndex &index)
     }
     if(info.isFile() && info.fileName().endsWith("pop.out")){
         qDebug() << "Reading genome "<< ui->sB_GenomeNumber->value() <<" from " <<info.fileName() << ".";
-        std::string fitness = ui->environmentWidget->readAndSetMOOGenomeFrom(ui->sB_GenomeNumber->value(), results->filePath(index));
+        std::string fitness = ui->environmentWidget->readAndSetMOGenomeFrom(ui->sB_GenomeNumber->value(), results->filePath(index));
         ui->label_Fitness->setText("Fitness: " + QString::fromStdString(fitness));
     }
 }

@@ -28,7 +28,7 @@ void ThreadClass::StartReplayProcess(){
     t = std::thread(&ThreadClass::ThreadEvoMain,this);
 }
 
-void ThreadClass::StartMOOProcess() {
+void ThreadClass::StartMOProcess() {
     env->initMultiObjectiveOptimization();
     t = std::thread(&ThreadClass::ThreadEvoMain,this);
 }

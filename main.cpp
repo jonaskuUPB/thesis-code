@@ -48,8 +48,8 @@ int main(int argc, char** argv)
         if(nsga){
             //Run an evolution
             ThreadClass* t = new ThreadClass();
-            t->SetupEnvironment("moo", default_settings);
-            t->StartMOOProcess();
+            t->SetupEnvironment("mo", default_settings);
+            t->StartMOProcess();
             t->Join();
         }
         if(evo){

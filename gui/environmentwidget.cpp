@@ -57,7 +57,7 @@ void EnvironmentWidget::saveTrace()
     env->saveCoveredDistance();
 }
 
-std::string EnvironmentWidget::readAndSetMOOGenomeFrom(int value, QString path){
+std::string EnvironmentWidget::readAndSetMOGenomeFrom(int value, QString path){
     QFile f(path);
     QStringList s;
 
