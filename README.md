@@ -2,7 +2,9 @@
 
 ## Scope of this implementation
 
-##Setting up and compiling
+## Setting up and compiling
+
+In order to build this code you will need to install QtCreator. The code is tested under QtCreator 3.5.1 (based on Qt 5.5.1) but should work with newer versions as well.
 
 The source code provided in this repository depends on a number of external libraries as well. Namely these are Box2D, Qt and my custom library for NSGA2. This repository provides my working implementations for Box2D and NSGA2 (in form of .zip archives) simply extract and build these folders.
 
@@ -12,7 +14,6 @@ Box2D:
 
 ```sh
 $ git clone https://github.com/flyover/Box2D
-
 $ (cd Box2D && git submodule init && git submodule update --recursive)
 ```
 
@@ -24,14 +25,18 @@ $ mkdir Build
 $ make libnsga2
 ```
 
-make sure to use American-English locale (alternative: C format) for numbers !! (otherwise you will have problems with the analysis and NSGA2)
+Make sure to use American-English locale (alternative: C format) for numbers! Otherwise you will have problems with the analysis and NSGA2.
 
-##Acknowledgements
+If everything is set up run qmake to generate the Makefile. Once you build the source code you will receive the executable file Simulator.
+
+## Acknowledgements
 
 
-##Misc notes
+## Misc notes
 
+```sh
 sudo apt-get install xorg-dev libglu1-mesa-dev
+```
 
 (already done)
 create folder results
