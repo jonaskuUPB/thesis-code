@@ -124,10 +124,12 @@ void Environment::setupExperiment(std::map<std::string, std::string> s){
         }
         number_of_genes = controller->getNumberOfGenes();
         action_layer_start = controller->getActionLayerStart();
-        int dx = uniform_rand(mt) % (WIDTH - 10) + 5;
-        int dy = uniform_rand(mt) % (HEIGHT - 10) + 5;
-        int angle = ((uniform_rand(mt) / (RAND_MAX / 360.0f)) - 180.0f);
-        agents.push_back(new Agent(_world, controller, b2Vec2(dx, dy), 20.0f, angle, 1.0f));
+
+        Agent* a = new Agent(_world, controller, b2Vec2(0, 0), 20.0f, 0, 1.0f);
+        a->new_random_position(mt);
+        a->reset_to_initial_position();
+        agents.push_back(a);
+
     }
 
     population_genomes.clear();
@@ -773,7 +775,7 @@ int Environment::rouletteWheelSelection(std::vector<float> fitnesses){
 
 void Environment::setNSGA2Objectives() {
     obj_NSGA2[0] = -genome_fitnesses.back();
-    obj_NSGA2[1] = data_k_distance.back().back();
+    obj_NSGA2[1] = -data_k_distance.back().back();
 }
 
 void Environment::NSGA2_testproblem() {
