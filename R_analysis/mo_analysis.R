@@ -40,7 +40,7 @@ plot_objectives <- function(population, infos) {
     non_dominated_set <- population[!(population$Objective1 %in% dominated_set$Objective1),]
     print(non_dominated_set)
     #plot(population[, 1:2], xlim = x_limits, ylim = y_limits, main = plot_title, sub = plot_sub)
-    plot(dominated_set, xlim = x_limits, ylim = y_limits, main = plot_title, sub = plot_sub, pch=21, col="black", bg="grey")
+    plot(dominated_set, xlim = x_limits, ylim = y_limits, main = plot_title, sub = plot_sub, xlab = x_label, ylab = y_label, pch=21, col="black", bg="grey")
     points(non_dominated_set, pch=21, col="black", bg="black")
   }
   else { # just plot
