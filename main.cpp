@@ -14,7 +14,7 @@
 #include "nsga2.h"
 
 bool gui = false; //if true the GUI will be shown, otherwise all unsupervised runs are started
-bool nsga = true; //starts one unsupervised run with NSGA-2
+bool nsga = false; //starts one unsupervised run with NSGA-2
 bool evo = false; //starts one unsupervised run with Evolution
 bool randANN = false; //starts one unsupervised run with random ANNs
 std::map<std::string, std::string> default_settings;
@@ -41,6 +41,22 @@ int main(int argc, char** argv)
     srand(time(NULL));
     default_settings["seed_int"] = std::to_string(Utils::newSeed());
 
+    if(argc > 0) {
+        for(int i = 0; i < argc; i++) {
+            if(strcmp(argv[i],"-g")==0) {
+                gui = true;
+            }
+            if(strcmp(argv[i],"-n")==0) {
+                nsga = true;
+            }
+            if(strcmp(argv[i],"-e")==0) {
+                evo = true;
+            }
+            if(strcmp(argv[i],"-c")==0) {
+                randANN = true;
+            }
+        }
+    }
 
     if(gui){
         guiRun(argc, argv);
