@@ -151,7 +151,7 @@ void Environment::setupExperiment(std::map<std::string, std::string> s){
     run_fitnesses.clear();
     generation_fitnesses.clear();
     genome_fitnesses.clear();
-    steps = 0;
+    steps_counter = 0;
     // some initial steps
     for(int i = 0; i < 5; i++){
         _world->Step(1.0f / 60.0f, 8, 3);
@@ -273,7 +273,7 @@ void Environment::updateEnvironment() {
         if(run_counter < setting_n_runs){ // runs
             if(generation_counter < setting_n_generations){ // generation
                 if(genome_counter < setting_n_genomes){ // genome
-                    if(steps < setting_steps_per_genome){ // steps
+                    if(steps_counter < setting_steps_per_genome){ // steps
                         _world->Step(1.0f / 60.0f, 32, 16);
                         if(!genome_set){
                             if (mode == 3) {
@@ -299,9 +299,9 @@ void Environment::updateEnvironment() {
                         temp_rotations_per_gen.push_back(getAverageDeltaAngle());
                         temp_k_distance_per_gen.push_back(getAverageKDistance());
                         if(mode>0){
-                            steps++;
+                            steps_counter++;
                         }
-                        emit stepFinished(steps);
+                        emit stepFinished(steps_counter);
                     }else{ // steps/genome finished
                         finished_genome();
                     }
@@ -347,7 +347,7 @@ void Environment::save_genome_stats(){
 }
 
 void Environment::finished_genome() {
-    steps = 0;
+    steps_counter = 0;
 
     if(mode>0){
         genome_set = false;
@@ -826,4 +826,17 @@ float Environment::getLastActionValue() {
 
 float Environment::getLastKDistance() {
     return temp_k_distance_per_gen.back();
+}
+
+
+int Environment::getGenerationCount() {
+    return generation_counter;
+}
+
+int Environment::getGenomeCount() {
+    return genome_counter;
+}
+
+float Environment::getLastFitness() {
+    return current_fitness / (float)(steps_counter * std::stoi(settings["n_agents_int"]));
 }

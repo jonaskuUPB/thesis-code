@@ -71,8 +71,11 @@ public:
     void updateEnvironment();
 
     //get current stats
+    int getGenerationCount();
+    int getGenomeCount();
     float getLastActionValue();
     float getLastKDistance();
+    float getLastFitness();
 
     void saveCoveredDistance();
 
@@ -107,7 +110,7 @@ protected:
     bool genome_set = false;
     ContactListener* cl;
     int timeStepScale = 1;
-    unsigned long int steps = 0;
+    unsigned long int steps_counter = 0;
     int run_counter = 0;
     int generation_counter = 0;
     int step_counter = 0;

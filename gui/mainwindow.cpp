@@ -65,8 +65,10 @@ void MainWindow::resetEnvironment(){
 void MainWindow::stepsChanged(unsigned long int s){
     ui->label_StepDisplay->setText(QString("Steps: ").append(QString::number(s)));
     //TODO: Other two stats
+    ui->label_GenomeCount->setText(QString("Generation: %1, Genome: %2").arg(ui->environmentWidget->getEnvironment()->getGenerationCount()).arg(ui->environmentWidget->getEnvironment()->getGenomeCount()));
     ui->label_ActionValueDisplay->setText(QString("Action Value: ").append(QString::number(ui->environmentWidget->getEnvironment()->getLastActionValue())));
     ui->label_KDistanceDisplay->setText(QString("K Distance: ").append(QString::number(ui->environmentWidget->getEnvironment()->getLastKDistance())));
+    ui->label_MaxClusterDisplay->setText(QString("Fitness: ").append(QString::number(ui->environmentWidget->getEnvironment()->getLastFitness())));
 }
 
 void MainWindow::avgFitnessChanged(float f){
