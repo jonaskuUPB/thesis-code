@@ -38,8 +38,6 @@ plot_objectives <- function(population, infos) {
   if(as.logical(infos[4])){ # highlight nondominated samples
     dominated_set <- dominated_solutions(population[, 1:2])
     non_dominated_set <- population[!(population$Objective1 %in% dominated_set$Objective1),]
-    print(non_dominated_set)
-    #plot(population[, 1:2], xlim = x_limits, ylim = y_limits, main = plot_title, sub = plot_sub)
     plot(dominated_set, xlim = x_limits, ylim = y_limits, main = plot_title, sub = plot_sub, xlab = x_label, ylab = y_label, pch=21, col="black", bg="grey")
     points(non_dominated_set, pch=21, col="black", bg="black")
   }
@@ -62,15 +60,40 @@ analyse_initial_pop <- function(directory, infos) {
   plot_objectives(initial_pop, infos)
 }
 
+load_best_pop <- function(directory) {
+  filename <- paste(directory, "best_pop.out", sep = "/")
+  best_pop <- readDataFromFile(filename)
+}
+
 analyse_experiment <- function(experiment) {
   info <- strsplit(experiment, "-")[[1]]
-  preparePlot(info[2])
   experimentFolder <- paste(experiment, "run_0", sep = "/")
   analyse_initial_pop(experimentFolder, info[2:3])
   analyse_final_pop(experimentFolder, info[2:3])
 }
 
+analyse_experiment_series <- function(series) {
+  preparePlot(series)
+  best_matrix <- list()
+   for (i in 1:3){
+     expName <- paste("mo", series, "Experiment", sep = "-")
+     expName <- paste(expName, i, sep = "_")
+     # analyse experiment
+     analyse_experiment(expName)
+     # load best front
+     experimentFolder <- paste(expName, "run_0", sep = "/")
+     best_matrix[[i]] <- load_best_pop(experimentFolder)[,1:2]
+     # load development
+   }
+  plot_title <- "Aggregation"
+  plot_sub <- "Results of the nondominated sets"
+  colors <- c("red", "blue", "green")
+  plot(best_matrix[[1]], xlim = x_limits, ylim = y_limits, main = plot_title, sub = plot_sub, xlab = x_label, ylab = y_label, pch=21, col="black", bg=colors[1])
+  points(best_matrix[[2]], pch=21, col="black", bg=colors[2])
+  points(best_matrix[[3]], pch=21, col="black", bg=colors[3])
+}
+
 full_mo_analysis <- function() {
   init()
-  analyse_experiment("mo-aggregation-Experiment_1")
+  analyse_experiment_series("aggregation")
 }
