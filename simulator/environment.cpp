@@ -775,7 +775,7 @@ int Environment::rouletteWheelSelection(std::vector<float> fitnesses){
 
 void Environment::setNSGA2Objectives() {
     obj_NSGA2[0] = -genome_fitnesses.back();
-    obj_NSGA2[1] = -data_k_distance.back().back();
+    obj_NSGA2[1] = -data_speed.back().back() + (data_k_distance.back().back()/100);
 }
 
 void Environment::NSGA2_testproblem() {
@@ -839,4 +839,8 @@ int Environment::getGenomeCount() {
 
 float Environment::getLastFitness() {
     return current_fitness / (float)(steps_counter * std::stoi(settings["n_agents_int"]));
+}
+
+float Environment::getLastSpeed() {
+    return temp_speeds_per_gen.back();
 }

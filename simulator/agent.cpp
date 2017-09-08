@@ -404,8 +404,8 @@ void Agent::sensingWall(int s){
 
 void Agent::new_random_position(std::mt19937& mt){
     std::uniform_int_distribution<int> uniform(0,RAND_MAX);
-    int dx = uniform(mt) % ((WIDTH - 10) / 2) + 5;
-    int dy = uniform(mt) % ((HEIGHT - 10) / 2)+ 5;
+    int dx = uniform(mt) % ((WIDTH - 10)) + 5;
+    int dy = uniform(mt) % ((HEIGHT - 10))+ 5;
     float new_angle = ((uniform(mt) / (RAND_MAX / 360.0f)) - 180.0f)* b2_pi / 180.0f;
     initial_x = dx;
     initial_y = dy;

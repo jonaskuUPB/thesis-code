@@ -76,6 +76,7 @@ public:
     float getLastActionValue();
     float getLastKDistance();
     float getLastFitness();
+    float getLastSpeed();
 
     void saveCoveredDistance();
 

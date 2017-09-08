@@ -83,7 +83,7 @@ std::string EnvironmentWidget::readAndSetMOGenomeFrom(int value, QString path){
     s.removeLast(); //remove constraint violation
     std::vector<float> temp_vector;
     for(auto const& f : s){
-        qDebug() << f;
+        //qDebug() << f;
         temp_vector.push_back(f.toFloat());
     }
     emit initEnvWithSettingsFromUi();
