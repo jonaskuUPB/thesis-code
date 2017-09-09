@@ -234,7 +234,7 @@ void Environment::initMultiObjectiveOptimization() {
     double *minBin = (double *)malloc(1*sizeof(double));
     double *maxBin = (double *)malloc(1*sizeof(double));
 
-    nsga2Params = SetParameters(seed, popSize, numGenerations, 2, 0, numGenes, minReal, maxReal, 0.9, mutRate, 20, 20, 0, numBits, minBin, maxBin, 0, 0, 1, 1, 2, 0, 0, 0, 0);
+    nsga2Params = SetParameters(seed, popSize, numGenerations, 3, 0, numGenes, minReal, maxReal, 0.9, mutRate, 20, 20, 0, numBits, minBin, maxBin, 0, 0, 1, 1, 2, 3, 3, 45, 25);
     ThreadClass* t = new ThreadClass();
     t->StartNSGA2Process(nsga2Params, inp, out);
 }
@@ -775,7 +775,8 @@ int Environment::rouletteWheelSelection(std::vector<float> fitnesses){
 
 void Environment::setNSGA2Objectives() {
     obj_NSGA2[0] = -genome_fitnesses.back();
-    obj_NSGA2[1] = -data_speed.back().back() + (data_k_distance.back().back()/100);
+    obj_NSGA2[1] = -data_speed.back().back();
+    obj_NSGA2[2] = data_k_distance.back().back();
 }
 
 void Environment::NSGA2_testproblem() {
