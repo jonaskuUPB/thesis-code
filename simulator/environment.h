@@ -80,6 +80,8 @@ public:
 
     void saveCoveredDistance();
 
+    void setGenomeCounters(int generation, int genome);
+
     //MISC:
     std::vector<Agent*> &getAgents();
     b2World* getWorld();

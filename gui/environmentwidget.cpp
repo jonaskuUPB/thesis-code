@@ -88,6 +88,7 @@ std::string EnvironmentWidget::readAndSetMOGenomeFrom(int value, QString path){
     }
     emit initEnvWithSettingsFromUi();
     env->setGenomeForAllAgents(temp_vector);
+    env->setGenomeCounters(0, value);
     update();
     return fitness;
 }

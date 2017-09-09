@@ -196,6 +196,7 @@ void Environment::generateRandomANNs(){
 
 void Environment::initGenomeReplay() {
     mode = 0;
+    //setting_steps_per_genome = 100000;
 }
 
 void Environment::initEvolution() {
@@ -298,9 +299,9 @@ void Environment::updateEnvironment() {
                         temp_speeds_per_gen.push_back(getAverageSpeed());
                         temp_rotations_per_gen.push_back(getAverageDeltaAngle());
                         temp_k_distance_per_gen.push_back(getAverageKDistance());
-                        if(mode>0){
-                            steps_counter++;
-                        }
+                        //if(mode>0){
+                        steps_counter++;
+                        //}
                         emit stepFinished(steps_counter);
                     }else{ // steps/genome finished
                         finished_genome();
@@ -360,6 +361,9 @@ void Environment::finished_genome() {
         if(genome_counter < setting_n_genomes){
             next_genome = population_genomes[genome_counter];
         }
+    } else {
+        saveCoveredDistance();
+        current_fitness = 0.0;
     }
     for(auto const& a : agents){
         a->reset_to_initial_position();
@@ -628,7 +632,7 @@ void Environment::savePoseAndSpeed(){
 
 void Environment::saveCoveredDistance(){
 
-    std::string fname = "distance_" + std::to_string(run_counter);
+    std::string fname = "trajectories_generation_" + std::to_string(generation_counter) + "_genome_" + std::to_string(genome_counter);
     std::ofstream file;
     file.open(trajectory_folder+fname);
     for(auto &a : agents){
@@ -844,4 +848,9 @@ float Environment::getLastFitness() {
 
 float Environment::getLastSpeed() {
     return temp_speeds_per_gen.back();
+}
+
+void Environment::setGenomeCounters(int generation, int genome) {
+    generation_counter = generation;
+    genome_counter = genome;
 }
