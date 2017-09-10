@@ -361,12 +361,12 @@ void Environment::finished_genome() {
         if(genome_counter < setting_n_genomes){
             next_genome = population_genomes[genome_counter];
         }
+        for(auto const& a : agents){
+            a->reset_to_initial_position();
+        }
     } else {
         saveCoveredDistance();
         current_fitness = 0.0;
-    }
-    for(auto const& a : agents){
-        a->reset_to_initial_position();
     }
     if(mode == 3) {
         std::unique_lock<std::mutex> set_lock(genomeEvalFinishedMutex);
