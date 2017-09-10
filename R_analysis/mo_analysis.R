@@ -85,7 +85,7 @@ analyse_experiment_series <- function(series) {
      best_matrix[[i]] <- load_best_pop(experimentFolder)[,1:2]
      # load development
    }
-  plot_title <- "Aggregation"
+  plot_title <- series
   plot_sub <- "Results of the nondominated sets"
   colors <- c("red", "blue", "green")
   plot(best_matrix[[1]], xlim = x_limits, ylim = y_limits, main = plot_title, sub = plot_sub, xlab = x_label, ylab = y_label, pch=21, col="black", bg=colors[1])
