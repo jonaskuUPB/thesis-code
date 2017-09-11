@@ -1,5 +1,5 @@
-init <- function() {
-  setwd("/home/jonas/Documents/Master/thesis")
+init_mo_analysis <- function() {
+  initWorkSpace()
   x_limits <<- c(-2,0)
   x_label <<- "prediction quality"
   y_limits <<- c(0, 0)
@@ -10,6 +10,9 @@ preparePlot <- function(experimentType) {
   if(experimentType=="aggregation") {
     y_limits <<- c(0,200)
     y_label <<- "k-distance"
+  } else if (experimentType=="dispersion") {
+    y_limits <<- c(-200,0)
+    y_label <<- "- k-distance"
   }
 }
 
@@ -94,6 +97,7 @@ analyse_experiment_series <- function(series) {
 }
 
 full_mo_analysis <- function() {
-  init()
+  init_mo_analysis()
   analyse_experiment_series("aggregation")
+  analyse_experiment_series("dispersion")
 }

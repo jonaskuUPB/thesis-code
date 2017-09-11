@@ -1,5 +1,5 @@
-init <- function() {
-  setwd("/home/jonas/Documents/Master/thesis")
+init_effectivity_analysis <- function() {
+  initWorkSpace()
 }
 
 normalize <- function(data) {
@@ -39,7 +39,6 @@ cvm_test <- function(evolutionSet, controlSet) {
 }
 
 run_analysis <- function(expTime = "2017_06_07-21_54_17", statsName = "action_gen", maxGen = 100, run = "run_0") {
-  init()
   ks_vec <- vector(,maxGen)
   cvm_vec <- vector(,maxGen)
   for(genCount in 0:(maxGen-1)){
@@ -58,6 +57,7 @@ run_analysis <- function(expTime = "2017_06_07-21_54_17", statsName = "action_ge
 }
 
 full_analysis <- function() {
+  init_effectivity_analysis()
   #exp <- c("2017_06_01-10_47_18", "2017_06_07-21_54_17", "2017_06_24-10_08_21", "2017_06_28-08_41_49", "2017_07_11-10_07_33", "2017_07_12-10_33_27")
   exp <- c("Experiment_1", "Experiment_2", "Experiment_3", "Experiment_4", "Experiment_5", "Experiment_6")
   runs <- c(0,0,0,0,0,0)
