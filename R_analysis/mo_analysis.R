@@ -36,7 +36,7 @@ dominated_solutions <- function(pop) {
 plot_objectives <- function(population, infos) {
   # par(pty="s")
   # print(infos)
-  plot_title <- paste(infos[1], infos[2], sep = " ")
+  plot_title <- capitalize(paste(infos[1], infos[2], sep = " "))
   plot_sub <- infos[3]
   if(as.logical(infos[4])){ # highlight nondominated samples
     dominated_set <- dominated_solutions(population[, 1:2])
@@ -83,12 +83,14 @@ analyse_experiment_series <- function(series) {
      expName <- paste(expName, i, sep = "_")
      # analyse experiment
      analyse_experiment(expName)
+     # analyse trajectories
+     analyse_trajectories(expName)
      # load best front
      experimentFolder <- paste(expName, "run_0", sep = "/")
      best_matrix[[i]] <- load_best_pop(experimentFolder)[,1:2]
      # load development
    }
-  plot_title <- series
+  plot_title <- capitalize(series)
   plot_sub <- "Results of the nondominated sets"
   colors <- c("red", "blue", "green")
   plot(best_matrix[[1]], xlim = x_limits, ylim = y_limits, main = plot_title, sub = plot_sub, xlab = x_label, ylab = y_label, pch=21, col="black", bg=colors[1])
