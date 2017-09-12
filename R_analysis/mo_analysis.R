@@ -16,8 +16,9 @@ preparePlot <- function(experimentType) {
   }
 }
 
-readDataFromFile <- function(fileName) {
-  t <- read.table(fileName)[,c(1:2,63:65)]
+readDataFromFile <- function(fileName, commentChar = "#") {
+  t <- read.table(fileName, comment.char = commentChar)[,c(1:2,63:65)]
+  # print(t)
   names(t) <- c("Objective1", "Objective2", "ConstraintViolation", "Rank", "CrowdingDistance")
   # t <- t[, c(2,1,3,4,5)]
   return(t)
@@ -63,6 +64,26 @@ analyse_initial_pop <- function(directory, infos) {
   plot_objectives(initial_pop, infos)
 }
 
+analyse_all_pop <- function(directory, infos) {
+  filename <- paste(directory, "all_pop.out", sep = "/")
+  all_pop <- readDataFromFile(filename, "#")
+  infos <- c(infos, c("all population"))
+  pop <- all_pop[,1]
+  first_obj <- matrix(nrow=52, ncol = 100)
+  for (x in 1:100){
+    tmp <- splitAt(pop, 53)
+    gen <- tmp[[1]]
+    if(length(tmp)>1){
+      pop <- tmp[[2]]
+    } else {
+      pop <- c()
+    }
+    first_obj[,x] <- gen
+  }
+  plot_title <- capitalize(paste(infos[1], infos[2], sep = " "))
+  boxplot.matrix(first_obj, main =plot_title)
+}
+
 load_best_pop <- function(directory) {
   filename <- paste(directory, "best_pop.out", sep = "/")
   best_pop <- readDataFromFile(filename)
@@ -73,6 +94,7 @@ analyse_experiment <- function(experiment) {
   experimentFolder <- paste(experiment, "run_0", sep = "/")
   analyse_initial_pop(experimentFolder, info[2:3])
   analyse_final_pop(experimentFolder, info[2:3])
+  analyse_all_pop(experimentFolder, info[2:3])
 }
 
 analyse_experiment_series <- function(series) {
