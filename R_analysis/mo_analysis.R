@@ -68,20 +68,33 @@ analyse_all_pop <- function(directory, infos) {
   filename <- paste(directory, "all_pop.out", sep = "/")
   all_pop <- readDataFromFile(filename, "#")
   infos <- c(infos, c("all population"))
-  pop <- all_pop[,1]
+  
+  pop1 <- all_pop[,1]
+  pop2 <- all_pop[,2]
+  
   first_obj <- matrix(nrow=52, ncol = 100)
+  second_obj <- matrix(nrow=52, ncol = 100)
   for (x in 1:100){
-    tmp <- splitAt(pop, 53)
-    gen <- tmp[[1]]
-    if(length(tmp)>1){
-      pop <- tmp[[2]]
+    tmp1 <- splitAt(pop1, 53)
+    first_obj[,x] <- tmp1[[1]]
+    
+    tmp2 <- splitAt(pop2, 53)
+    second_obj[,x] <- tmp2[[1]]
+    
+    if(length(tmp1)>1){
+      pop1 <- tmp1[[2]]
+      pop2 <- tmp2[[2]]
     } else {
-      pop <- c()
+      pop1 <- c()
+      pop2 <- c()
     }
-    first_obj[,x] <- gen
   }
   plot_title <- capitalize(paste(infos[1], infos[2], sep = " "))
-  boxplot.matrix(first_obj, main =plot_title)
+  sub_title <- "Development of first objective"
+  boxplot.matrix(first_obj, main =plot_title, sub = sub_title, ylab = x_label, xlab = "generation")
+  
+  sub_title <- "Development of second objective"
+  boxplot.matrix(second_obj, main =plot_title, sub = sub_title, ylab = y_label, xlab = "generation")
 }
 
 load_best_pop <- function(directory) {
