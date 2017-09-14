@@ -91,6 +91,8 @@ public:
     void printResults();
     bool finished = false;
     bool environment_initialized = false;
+
+    int numNSGA2_Obj = 3;
     void internal_setNSGA2Genome(double *xreal, double *xbin, int **gene, double *obj, double *constr, void* inp, void* out);
     static void setNSGA2Genome(double *xreal, double *xbin, int **gene, double *obj, double *constr, void* inp, void* out);
 

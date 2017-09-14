@@ -6,7 +6,7 @@ analyse_trajectory <- function(filename) {
   t <- read.table(filename)
   s <- strsplit(filename, "/")[[1]]
   exp <- strsplit(s[1], "-")[[1]][2:3]
-  print(exp)
+  # print(exp)
   gen <- strsplit(s[4], "_")[[1]][5]
   plot_title <- paste("Trajectory", capitalize(exp[1]), capitalize(exp[2]), "Genome", capitalize(gen), sep=" ")
   sub_title <- paste("Genome", capitalize(gen), "of the final non-dominated set")

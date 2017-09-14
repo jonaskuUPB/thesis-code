@@ -78,6 +78,9 @@ std::string EnvironmentWidget::readAndSetMOGenomeFrom(int value, QString path){
     std::string fitness = s[0].toStdString();  // store fitness for gui
     s.removeAt(0);
     s.removeFirst(); //remove second objective
+    if(env->numNSGA2_Obj>2){
+        s.removeFirst(); //remove third objective
+    }
     s.removeLast(); //remove crowding distance
     s.removeLast(); //remove rank
     s.removeLast(); //remove constraint violation
