@@ -10,3 +10,8 @@ capitalize <- function(x) {
 splitAt <- function(x, pos) {
   unname(split(x, cumsum(seq_along(x) %in% pos)))
 }
+
+analyse_everything <- function() {
+  full_analysis()
+  full_mo_analysis()
+}

@@ -69,13 +69,16 @@ full_analysis <- function() {
   k_distance_matrix_cvm <- matrix(ncol = length(exp), nrow = 100)
   for(i in 1:length(exp)){
     for(j in 0:runs[i]) {
-      action_matrix_ks[,i] <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"))[,1]
-      action_matrix_cvm[,i] <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"))[,2]
-      speed_matrix_ks[,i] <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "speed_gen")[,1]
-      speed_matrix_cvm[,i] <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "speed_gen")[,2]
+      action_result <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), agglo = "concat")
+      action_matrix_ks[,i] <- action_result[,1]
+      action_matrix_cvm[,i] <- action_result[,2]
+      speed_result <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "speed_gen", agglo = "concat")
+      speed_matrix_ks[,i] <- speed_result[,1]
+      speed_matrix_cvm[,i] <- speed_result[,2]
       if(i>=4) {
-        k_distance_matrix_ks[,i] <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "k_distance_gen")[,1]
-        k_distance_matrix_cvm[,i] <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "k_distance_gen")[,2]
+        distance_result <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "k_distance_gen", agglo = "concat")
+        k_distance_matrix_ks[,i] <- distance_result[,1]
+        k_distance_matrix_cvm[,i] <- distance_result[,2]
       }
     }
   }

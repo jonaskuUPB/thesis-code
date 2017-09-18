@@ -16,11 +16,14 @@ preparePlot <- function(experimentType) {
   }
 }
 
-readDataFromFile <- function(fileName, commentChar = "#") {
-  t <- read.table(fileName, comment.char = commentChar)[,c(1:2,63:65)]
+readDataFromFile <- function(fileName, commentChar = "#", numObj = 2) {
+  t <- read.table(fileName, comment.char = commentChar)[,c(1:numObj,(61+numObj):(63+numObj))]
   # print(t)
-  names(t) <- c("Objective1", "Objective2", "ConstraintViolation", "Rank", "CrowdingDistance")
-  # t <- t[, c(2,1,3,4,5)]
+  if(numObj==2){
+    names(t) <- c("Objective1", "Objective2", "ConstraintViolation", "Rank", "CrowdingDistance")
+  } else {
+    names(t) <- c("Objective1", "Objective2", "Objective3", "ConstraintViolation", "Rank", "CrowdingDistance")
+  }
   return(t)
 }
 
@@ -50,23 +53,23 @@ plot_objectives <- function(population, infos) {
   }
 }
 
-analyse_final_pop <- function(directory, infos) {
+analyse_final_pop <- function(directory, infos, numObj = 2) {
   filename <- paste(directory, "final_pop.out", sep = "/")
-  final_pop <- readDataFromFile(filename)
+  final_pop <- readDataFromFile(filename, numObj=numObj)
   infos <- c(infos, c("final population", TRUE))
   plot_objectives(final_pop, infos)
 }
 
-analyse_initial_pop <- function(directory, infos) {
+analyse_initial_pop <- function(directory, infos, numObj = 2) {
   filename <- paste(directory, "initial_pop.out", sep = "/")
-  initial_pop <- readDataFromFile(filename)
+  initial_pop <- readDataFromFile(filename, numObj=numObj)
   infos <- c(infos, c("initial population", FALSE))
   plot_objectives(initial_pop, infos)
 }
 
-analyse_all_pop <- function(directory, infos) {
+analyse_all_pop <- function(directory, infos, numObj = 2) {
   filename <- paste(directory, "all_pop.out", sep = "/")
-  all_pop <- readDataFromFile(filename, "#")
+  all_pop <- readDataFromFile(filename, "#", numObj=numObj)
   infos <- c(infos, c("all population"))
   
   pop1 <- all_pop[,1]
@@ -74,6 +77,12 @@ analyse_all_pop <- function(directory, infos) {
   
   first_obj <- matrix(nrow=52, ncol = 100)
   second_obj <- matrix(nrow=52, ncol = 100)
+  
+  if(numObj==3) {
+    pop3 <- all_pop[,3]
+    third_obj <- matrix(nrow=52, ncol = 100)
+  }
+  
   for (x in 1:100){
     tmp1 <- splitAt(pop1, 53)
     first_obj[,x] <- tmp1[[1]]
@@ -81,12 +90,23 @@ analyse_all_pop <- function(directory, infos) {
     tmp2 <- splitAt(pop2, 53)
     second_obj[,x] <- tmp2[[1]]
     
+    if(numObj==3) {
+      tmp3 <- splitAt(pop3, 53)
+      third_obj[,x] <- tmp3[[1]]
+    }
+    
     if(length(tmp1)>1){
       pop1 <- tmp1[[2]]
       pop2 <- tmp2[[2]]
+      if(numObj==3) {
+        pop3 <- tmp3[[2]]
+      }
     } else {
       pop1 <- c()
       pop2 <- c()
+      if(numObj==3) {
+        pop3 <- c()
+      }
     }
   }
   plot_title <- capitalize(paste(infos[1], infos[2], sep = " "))
@@ -95,19 +115,24 @@ analyse_all_pop <- function(directory, infos) {
   
   sub_title <- "Development of second objective"
   boxplot.matrix(second_obj, main =plot_title, sub = sub_title, ylab = y_label, xlab = "generation")
+  
+  if(numObj==3) {
+    sub_title <- "Development of third objective"
+    boxplot.matrix(second_obj, main =plot_title, sub = sub_title, ylab = z_label, xlab = "generation")
+  }
 }
 
-load_best_pop <- function(directory) {
+load_best_pop <- function(directory, numObj = 2) {
   filename <- paste(directory, "best_pop.out", sep = "/")
-  best_pop <- readDataFromFile(filename)
+  best_pop <- readDataFromFile(filename, numObj=numObj)
 }
 
-analyse_experiment <- function(experiment) {
+analyse_experiment <- function(experiment, numObj = 2) {
   info <- strsplit(experiment, "-")[[1]]
   experimentFolder <- paste(experiment, "run_0", sep = "/")
-  analyse_initial_pop(experimentFolder, info[2:3])
-  analyse_final_pop(experimentFolder, info[2:3])
-  analyse_all_pop(experimentFolder, info[2:3])
+  analyse_initial_pop(experimentFolder, info[2:3], numObj = numObj)
+  analyse_final_pop(experimentFolder, info[2:3], numObj = numObj)
+  analyse_all_pop(experimentFolder, info[2:3], numObj = numObj)
 }
 
 analyse_experiment_series <- function(series) {
@@ -137,4 +162,13 @@ full_mo_analysis <- function() {
   init_mo_analysis()
   analyse_experiment_series("aggregation")
   analyse_experiment_series("dispersion")
+  expName = "mo-flocking-Experiment_0"
+  analyse_experiment(expName)
+  analyse_trajectories(expName)
+  expName = "mo-flocking2o-Experiment_1"
+  analyse_experiment(expName)
+  analyse_trajectories(expName)
+  expName = "mo-flocking3o-Experiment_1"
+  analyse_experiment(expName, numObj=3)
+  analyse_trajectories(expName)
 }
