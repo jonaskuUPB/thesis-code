@@ -13,6 +13,11 @@ preparePlot <- function(experimentType) {
   } else if (experimentType=="dispersion") {
     y_limits <<- c(-200,0)
     y_label <<- "- k-distance"
+  } else if (experimentType=="flocking") {
+    y_limits <<- c(-1,0)
+    y_label <<- "speed"
+    z_limits <<- c(0, 200)
+    z_label <<- "k-distance"
   }
 }
 
@@ -118,7 +123,7 @@ analyse_all_pop <- function(directory, infos, numObj = 2) {
   
   if(numObj==3) {
     sub_title <- "Development of third objective"
-    boxplot.matrix(second_obj, main =plot_title, sub = sub_title, ylab = z_label, xlab = "generation")
+    boxplot.matrix(third_obj, main =plot_title, sub = sub_title, ylab = z_label, xlab = "generation")
   }
 }
 
@@ -138,13 +143,15 @@ analyse_experiment <- function(experiment, numObj = 2) {
 analyse_experiment_series <- function(series) {
   preparePlot(series)
   best_matrix <- list()
+  exp <- list()
    for (i in 1:3){
      expName <- paste("mo", series, "Experiment", sep = "-")
      expName <- paste(expName, i, sep = "_")
+     exp <- c(exp, paste("Experiment", i, sep="_"))
      # analyse experiment
      analyse_experiment(expName)
      # analyse trajectories
-     analyse_trajectories(expName)
+     # analyse_trajectories(expName)
      # load best front
      experimentFolder <- paste(expName, "run_0", sep = "/")
      best_matrix[[i]] <- load_best_pop(experimentFolder)[,1:2]
@@ -152,16 +159,21 @@ analyse_experiment_series <- function(series) {
    }
   plot_title <- capitalize(series)
   plot_sub <- "Results of the nondominated sets"
+  default_par <- par()
+  par(mar = c(5,4,4,8), xpd=TRUE)
   colors <- c("red", "blue", "green")
   plot(best_matrix[[1]], xlim = x_limits, ylim = y_limits, main = plot_title, sub = plot_sub, xlab = x_label, ylab = y_label, pch=21, col="black", bg=colors[1])
   points(best_matrix[[2]], pch=21, col="black", bg=colors[2])
   points(best_matrix[[3]], pch=21, col="black", bg=colors[3])
+  legend("right", inset=c(-0.22,0), legend = exp, cex=0.8,fill=colors)
+  par(default_par)
 }
 
 full_mo_analysis <- function() {
   init_mo_analysis()
   analyse_experiment_series("aggregation")
   analyse_experiment_series("dispersion")
+  preparePlot("flocking")
   expName = "mo-flocking-Experiment_0"
   analyse_experiment(expName)
   analyse_trajectories(expName)
