@@ -114,7 +114,7 @@ analyse_all_pop <- function(directory, infos, numObj = 2) {
       }
     }
   }
-  plot_title <- capitalize(paste(infos[1], infos[2], sep = " "))
+  plot_title <- capitalize(paste(infos[1], strsplit(infos[2], "_")[[1]], sep = " "))
   sub_title <- "Development of first objective"
   boxplot.matrix(first_obj, main =plot_title, sub = sub_title, ylab = x_label, xlab = "generation")
   
@@ -151,7 +151,7 @@ analyse_experiment_series <- function(series) {
      # analyse experiment
      analyse_experiment(expName)
      # analyse trajectories
-     # analyse_trajectories(expName)
+     analyse_trajectories(expName)
      # load best front
      experimentFolder <- paste(expName, "run_0", sep = "/")
      best_matrix[[i]] <- load_best_pop(experimentFolder)[,1:2]

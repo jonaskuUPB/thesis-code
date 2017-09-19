@@ -62,8 +62,8 @@ run_analysis <- function(expTime = "2017_06_07-21_54_17", statsName = "action_ge
   tmp <- strsplit(statsName, "_")[[1]]
   statsDisplay <- paste(tmp[1:length(tmp)-1], sep=" ", collapse=" ")
   expDisplay <- paste(strsplit(expTime, "_")[[1]], sep=" ", collapse=" ")
-  runDisplay <- paste(strsplit(run, "_")[[1]], sep=" ",collapse = " ")
-  plot_title <- paste(as.character(substitute(agglo)), statsDisplay, "-", expDisplay, runDisplay)
+  # runDisplay <- paste(strsplit(run, "_")[[1]], sep=" ",collapse = " ")
+  plot_title <- paste(as.character(substitute(agglo)), statsDisplay, "-", expDisplay)
   plot_title <- capitalize(plot_title)
   plot(ks_vec, main = plot_title, sub="KS-test", xlab = "generation", ylab = "p value", ylim=c(0,1))
   plot(cvm_vec, main = plot_title, sub="CvM-test", xlab = "generation", ylab = "p value", ylim=c(0,1))
@@ -91,16 +91,16 @@ full_analysis <- function() {
   mean_cluster_matrix_cvm <- matrix(ncol = length(exp), nrow = 100)
   for(i in 1:length(exp)){
     for(j in 0:runs[i]) {
-      #action_result <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"))
-      #action_matrix_ks[,i] <- action_result[,1]
-      #action_matrix_cvm[,i] <- action_result[,2]
-      #speed_result <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "speed_gen")
-      #speed_matrix_ks[,i] <- speed_result[,1]
-      #speed_matrix_cvm[,i] <- speed_result[,2]
+      action_result <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"))
+      action_matrix_ks[,i] <- action_result[,1]
+      action_matrix_cvm[,i] <- action_result[,2]
+      speed_result <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "speed_gen")
+      speed_matrix_ks[,i] <- speed_result[,1]
+      speed_matrix_cvm[,i] <- speed_result[,2]
       if(i>=4) {
-        #distance_result <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "k_distance_gen")
-        #k_distance_matrix_ks[,i] <- distance_result[,1]
-        #k_distance_matrix_cvm[,i] <- distance_result[,2]
+        distance_result <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "k_distance_gen")
+        k_distance_matrix_ks[,i] <- distance_result[,1]
+        k_distance_matrix_cvm[,i] <- distance_result[,2]
         max_cluster_result <- run_analysis(expTime = exp[i], run = paste("run", j, sep = "_"), statsName = "cluster_size_gen", agglo=max)
         max_cluster_matrix_ks[,i] <- max_cluster_result[,1]
         max_cluster_matrix_cvm[,i] <- max_cluster_result[,2]
