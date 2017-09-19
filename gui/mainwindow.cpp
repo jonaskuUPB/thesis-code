@@ -90,6 +90,8 @@ void MainWindow::on_treeView_doubleClicked(const QModelIndex &index)
     if(info.isFile() && info.fileName().startsWith("settings")){
         qDebug() << "Experiment set up with settings from " << info.fileName() << ".";
         std::map<std::string, std::string> settings = ui->environmentWidget->readSettingsFrom(results->filePath(index));
+        ui->environmentWidget->getEnvironment()->genome_folder = info.path().append("/genomes/").toStdString();
+        std::cout << ui->environmentWidget->getEnvironment()->genome_folder << std::endl;
         displaySettings(settings);
         readAndSetSettingsfromUi();
     }

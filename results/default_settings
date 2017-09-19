@@ -5,6 +5,6 @@ n_agents_int=50
 n_generations_int=100
 n_genomes_int=52
 n_runs_int=1
-n_steps_per_genome_int=2000
+n_steps_per_genome_int=6000
 seed_int=-1490677913
 type_evo_int=1

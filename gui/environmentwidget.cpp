@@ -76,7 +76,7 @@ std::string EnvironmentWidget::readAndSetMOGenomeFrom(int value, QString path){
     }
     f.close();
     std::string fitness = s[0].toStdString();  // store fitness for gui
-    s.removeAt(0);
+    s.removeFirst(); //remove first objective
     s.removeFirst(); //remove second objective
     if(env->numNSGA2_Obj>2){
         s.removeFirst(); //remove third objective
@@ -86,7 +86,7 @@ std::string EnvironmentWidget::readAndSetMOGenomeFrom(int value, QString path){
     s.removeLast(); //remove constraint violation
     std::vector<float> temp_vector;
     for(auto const& f : s){
-        //qDebug() << f;
+        qDebug() << f;
         temp_vector.push_back(f.toFloat());
     }
     emit initEnvWithSettingsFromUi();
