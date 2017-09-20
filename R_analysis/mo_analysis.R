@@ -14,10 +14,10 @@ preparePlot <- function(experimentType) {
     y_limits <<- c(-200,0)
     y_label <<- "- k-distance"
   } else if (experimentType=="flocking") {
-    y_limits <<- c(-1,0)
-    y_label <<- "speed"
-    z_limits <<- c(0, 200)
-    z_label <<- "k-distance"
+    y_limits <<- c(0, 200)
+    y_label <<- "k-distance"
+    z_limits <<- c(-1,0)
+    z_label <<- "speed"
   }
 }
 
@@ -27,6 +27,7 @@ readDataFromFile <- function(fileName, commentChar = "#", numObj = 2) {
   if(numObj==2){
     names(t) <- c("Objective1", "Objective2", "ConstraintViolation", "Rank", "CrowdingDistance")
   } else {
+    t <- t[c(1,3,2,4,5,6)]
     names(t) <- c("Objective1", "Objective2", "Objective3", "ConstraintViolation", "Rank", "CrowdingDistance")
   }
   return(t)
@@ -114,7 +115,7 @@ analyse_all_pop <- function(directory, infos, numObj = 2) {
       }
     }
   }
-  plot_title <- capitalize(paste(infos[1], strsplit(infos[2], "_")[[1]], sep = " "))
+  plot_title <- capitalize(paste(infos[1], paste(strsplit(infos[2], "_")[[1]], sep = " ", collapse = " "), sep =" "))
   sub_title <- "Development of first objective"
   boxplot.matrix(first_obj, main =plot_title, sub = sub_title, ylab = x_label, xlab = "generation")
   
@@ -171,8 +172,8 @@ analyse_experiment_series <- function(series) {
 
 full_mo_analysis <- function() {
   init_mo_analysis()
-  analyse_experiment_series("aggregation")
-  analyse_experiment_series("dispersion")
+  #analyse_experiment_series("aggregation")
+  #analyse_experiment_series("dispersion")
   preparePlot("flocking")
   expName = "mo-flocking-Experiment_0"
   analyse_experiment(expName)
