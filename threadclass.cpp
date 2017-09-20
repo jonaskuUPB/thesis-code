@@ -17,7 +17,7 @@ void ThreadClass::StartEvoProcess()
     t = std::thread(&ThreadClass::ThreadEvoMain,this);
 }
 
-void ThreadClass::StartReplayProcess(){
+void ThreadClass::StartControlExperimentProcess(){
     env->initExperimentReplay();
     env->generateRandomANNs();
     QString path = QString();
@@ -25,6 +25,21 @@ void ThreadClass::StartReplayProcess(){
     path.append(QString::fromStdString("gen_0"));
     std::vector<std::vector<float>> temp_genomes = Utils::readAllGenomesFromEvolutionFile(path);
     env->setPopulation(temp_genomes);
+    t = std::thread(&ThreadClass::ThreadEvoMain,this);
+}
+
+void ThreadClass::StartReplayProcess(std::string runFolder, std::string settingsFile) {
+    env->initExperimentReplay();
+    QString settings = QString::fromStdString(runFolder).append(QString::fromStdString(settingsFile));
+    env->setSettings(Utils::readSettingsFrom(settings));
+    env->genome_folder = QString::fromStdString(runFolder).append(QString::fromStdString("genomes/")).toStdString();
+    qDebug() << QString::fromStdString(env->genome_folder);
+    QString path = QString();
+    path.append(QString::fromStdString(env->genome_folder));
+    path.append(QString::fromStdString("gen_0"));
+    std::vector<std::vector<float>> temp_genomes = Utils::readAllGenomesFromEvolutionFile(path);
+    env->setPopulation(temp_genomes);
+    qDebug() << QString::fromStdString(env->stats_folder);
     t = std::thread(&ThreadClass::ThreadEvoMain,this);
 }
 
