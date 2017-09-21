@@ -61,6 +61,11 @@ int main(int argc, char** argv)
     if(gui){
         guiRun(argc, argv);
     }else{
+        ThreadClass* t = new ThreadClass();
+        t->SetupEnvironment("replay", default_settings);
+        t->StartReplayProcess("results/control-2017_06_24-10_08_21/run_0/", "settings_run_0_1260797451");
+        t->Join();
+        /*
         if(nsga){
             //Run an evolution
             ThreadClass* t = new ThreadClass();
@@ -79,10 +84,11 @@ int main(int argc, char** argv)
             //Run a replay
             ThreadClass* t2 = new ThreadClass();
             t2->SetupEnvironment("control", default_settings);
-            t2->StartReplayProcess();
+            t2->StartControlExperimentProcess();
             t2->Join();
         }
         //finally turn of the computer
         //system("shutdown -P now");
+        */
     }
 }
