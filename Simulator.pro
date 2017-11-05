@@ -6,7 +6,7 @@
 
 CONFIG += c++11
 QMAKE_CXXFLAGS += -fno-strict-aliasing
-INCLUDEPATH += Box2D/
+INCLUDEPATH += Box2D/Box2D/
 INCLUDEPATH += NSGA2/
 INCLUDEPATH += simulator/
 LIBS += -lBox2D -lpthread -pthread
@@ -60,14 +60,14 @@ HEADERS  += \
 FORMS += \
     gui/mainwindow.ui
 
-unix:!macx: LIBS += -L$$PWD/Box2D/Build/Box2D/ -lBox2D
+unix:!macx: LIBS += -L$$PWD/Box2D/Box2D/Build/Box2D/ -lBox2D
 unix:!macx: LIBS += -L$$PWD/NSGA2/build/ -lNSGA2
 
-INCLUDEPATH += $$PWD/Box2D/Build/Box2D
-DEPENDPATH += $$PWD/Box2D/Build/Box2D
+INCLUDEPATH += $$PWD/Box2D/Box2D/Build/Box2D
+DEPENDPATH += $$PWD/Box2D/Box2D/Build/Box2D
 
 INCLUDEPATH += $$PWD/NSGA2/build/
 DEPENDPATH += $$PWD/NSGA2/build/
 
-unix:!macx: PRE_TARGETDEPS += $$PWD/Box2D/Build/Box2D/libBox2D.a
+unix:!macx: PRE_TARGETDEPS += $$PWD/Box2D/Box2D/Build/Box2D/libBox2D.a
 unix:!macx: PRE_TARGETDEPS += $$PWD/NSGA2/build/libNSGA2.a

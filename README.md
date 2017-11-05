@@ -13,8 +13,11 @@ If you want to get the latest versions, try the following commands in the termin
 Box2D:
 
 ```sh
-$ git clone https://github.com/flyover/Box2D
-$ (cd Box2D && git submodule init && git submodule update --recursive)
+$ cd Box2D/Box2D
+$ mkdir -p Build
+$ cd Build
+$ cmake ..
+$ make
 ```
 
 NSGA2:

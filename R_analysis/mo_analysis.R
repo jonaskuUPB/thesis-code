@@ -13,7 +13,10 @@ preparePlot <- function(experimentType) {
   } else if (experimentType=="dispersion") {
     y_limits <<- c(-200,0)
     y_label <<- "- k-distance"
-  } else if (experimentType=="flocking") {
+  } else if (experimentType=="flocking2o") {
+    y_limits <<- c(0, 1)
+    y_label <<- "aggregated objective"
+  } else if (experimentType=="flocking3o") {
     y_limits <<- c(0, 200)
     y_label <<- "k-distance"
     z_limits <<- c(-1,0)
@@ -172,15 +175,16 @@ analyse_experiment_series <- function(series) {
 
 full_mo_analysis <- function() {
   init_mo_analysis()
-  #analyse_experiment_series("aggregation")
-  #analyse_experiment_series("dispersion")
-  preparePlot("flocking")
+  analyse_experiment_series("aggregation")
+  analyse_experiment_series("dispersion")
+  preparePlot("flocking2o")
   expName = "mo-flocking-Experiment_0"
   analyse_experiment(expName)
   analyse_trajectories(expName)
   expName = "mo-flocking2o-Experiment_1"
   analyse_experiment(expName)
   analyse_trajectories(expName)
+  preparePlot("flocking3o")
   expName = "mo-flocking3o-Experiment_1"
   analyse_experiment(expName, numObj=3)
   analyse_trajectories(expName)
